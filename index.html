@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Health Assessment — Unlimitr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/theme.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <style>
+    .condition-extra {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+    }
+    .condition-extra.show {
+      max-height: 500px;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body data-page="assessment">
+  <main class="app-shell">
+    <header class="hero">
+      <div class="hero-logo-wrap">
+        <img class="logo" src="https://unlimitr.com/img/hca_logo.svg" alt="Unlimitr">
+      </div>
+      <div class="pill">Genie AI Health Assessment</div>
+      <h1>Let's Decode Your Transformation Journey!</h1>
+      <p>Answer These Quick Questions So We Can Design A Plan That Fits You, Not The Other Way Around.</p>
+    </header>
+
+    <form id="assessmentForm" class="glass-card" novalidate>
+      <div class="form-step-header d-flex justify-content-between align-items-center gap-3 mb-3">
+        <div class="stepper flex-grow-1">
+          <div class="step"><span></span></div>
+          <div class="step"><span></span></div>
+          <div class="step"><span></span></div>
+          <div class="step"><span></span></div>
+        </div>
+        <div class="step-label" id="stepLabel">Step 1 of 4</div>
+      </div>
+
+      <section class="step-panel active" data-step="1">
+        <div class="step-title">Personal Details</div>
+        <div class="step-note">These Details Help Us To Personalize Your Health Report &amp; Recommendations.</div>
+        <div class="row g-3">
+          <div class="col-md-6 field-wrap" data-info="We'll use your name to personalize your health report.">
+            <label class="form-label">Name <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <input class="form-control" name="clientName" placeholder="Full Name" data-validate="required" />
+            <span class="field-error"></span>
+          </div>
+          <div class="col-md-6 field-wrap" data-info="Your report summary will be sent here.">
+            <label class="form-label">Email ID <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <input class="form-control" type="email" name="clientEmail" placeholder="Email Address" data-validate="email" />
+            <span class="field-error"></span>
+          </div>
+          <div class="col-md-6 field-wrap" data-info="This helps us calculate safe fat-loss speed.">
+            <label class="form-label">Date of Birth <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <div class="premium-date-wrap">
+              <input type="text" class="form-control premium-date" name="dateOfBirth" placeholder="Select date" data-validate="required" id="dateOfBirthInput" />
+            </div>
+            <input type="hidden" name="age" id="ageField" />
+            <span class="field-error"></span>
+          </div>
+          <div class="col-md-6 field-wrap" data-info="This helps personalize metabolic calculations.">
+            <label class="form-label">Gender <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <select class="form-select" name="gender" data-validate="required" id="genderSelect">
+              <option value="">Select</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+            <span class="field-error"></span>
+          </div>
+          <div class="col-12 field-wrap d-none" id="menstrualWrap">
+            <label class="form-label">Menstrual Cycle Pattern</label>
+            <select class="form-select" name="menstrualCycle" id="menstrualCycle">
+              <option value="">Select</option>
+              <option value="regular">Regular</option>
+              <option value="irregular">Irregular</option>
+              <option value="missed">Missed cycles</option>
+              <option value="contraceptives">On contraceptives</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="2">
+        <div class="step-title">Body Metrics</div>
+        <div class="step-note">Needed to compute BMI, BMR, and metabolic age.</div>
+        <div class="row g-4">
+          <div class="col-12 field-wrap" data-info="Accurate height improves BMI precision.">
+            <label class="form-label">Height <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <input type="range" class="form-range slider-premium" id="heightSlider" name="height" min="140" max="210" value="172" />
+            <div class="range-display"><span id="heightCm">172</span> cm (<span id="heightFtIn">5 ft 8 in</span>)</div>
+            <span class="field-error"></span>
+          </div>
+          <div class="col-12 field-wrap" data-info="This helps determine your metabolic baseline.">
+            <label class="form-label">Weight <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <input type="range" class="form-range slider-premium" id="weightSlider" name="weight" min="40" max="200" value="78" />
+            <div class="range-display">Weight: <span id="weightKg">78</span> kg (<span id="weightLbs">172</span> lbs)</div>
+            <span class="field-error"></span>
+          </div>
+          <div class="col-12 field-wrap" data-info="We'll calculate timeline based on this.">
+            <label class="form-label">Target Weight <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <input type="range" class="form-range slider-premium" id="targetWeightSlider" name="targetWeight" min="40" max="200" value="70" />
+            <div class="range-display">Target: <span id="targetWeightKg">70</span> kg (<span id="targetWeightLbs">154</span> lbs)</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="3">
+        <div class="step-title">Lifestyle Signals</div>
+        <div class="step-note">These Answers Help Us Tailor Your Plan As Per Your Current Lifestyle</div>
+        <div class="row g-3">
+          <div class="col-12 field-wrap" data-info="This helps us calculate realistic calorie expenditure.">
+            <label class="form-label">Activity Level <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <select class="form-select" name="activityLevel" data-validate="required">
+              <option value="">Select</option>
+              <option value="sedentary">Sedentary (Minimal movement, desk-based lifestyle)</option>
+              <option value="light">Lightly Active (Walking or light exercise 1–2x/week)</option>
+              <option value="moderate">Moderately Active (Structured exercise 3–4x/week)</option>
+              <option value="high">Highly Active (Intense training 5+ days/week)</option>
+            </select>
+            <span class="field-error"></span>
+          </div>
+          <div class="col-12 field-wrap" data-info="Sleep directly impacts fat loss hormones.">
+            <label class="form-label">Sleep Quality <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <select class="form-select" name="sleepQuality">
+              <option value="">Select</option>
+              <option value="poor">Less than 6 hours or disturbed sleep</option>
+              <option value="inconsistent">6–7 hours, inconsistent</option>
+              <option value="good">7–8 hours, mostly consistent</option>
+              <option value="restorative">Deep & restorative sleep daily</option>
+            </select>
+          </div>
+          <div class="col-12 field-wrap" data-info="Chronic stress affects cortisol and fat storage.">
+            <label class="form-label">Stress Level <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <select class="form-select" name="stressLevel">
+              <option value="">Select</option>
+              <option value="low">Low (Well managed)</option>
+              <option value="moderate">Moderate (Work/life pressure present)</option>
+              <option value="high">High (Frequent mental strain)</option>
+              <option value="very-high">Very High (Chronic stress)</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="step-panel" data-step="4">
+        <div class="step-title">Health & Goals</div>
+        <div class="step-note">We align plan intensity to your lifestyle and goals.</div>
+        <div class="row g-3">
+          <div class="col-12 field-wrap" data-info="This ensures your plan is medically safe.">
+            <label class="form-label">Any Health Issues <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <div class="health-issues-list" id="healthIssuesList">
+              <label class="health-issue-option">
+                <input type="radio" name="healthIssueMain" value="none" id="noMedicalIssues" checked /> No Medical Issues
+              </label>
+              <label class="health-issue-option">
+                <input type="radio" name="healthIssueMain" value="has" /> I have one or more of the following
+              </label>
+              <div class="health-issues-checkboxes mt-2 ms-3">
+                <div class="condition-item" id="diabetesOption">
+                  <label class="health-issue-option condition-label">
+                    <input type="checkbox" name="health_diabetes" id="diabetesCheck" value="diabetes" /> Diabetes
+                  </label>
+                  <div class="condition-extra" id="diabetesFields">
+                    <div class="mt-3">
+                      <label class="form-label">HbA1c (%)</label>
+                      <input type="number" class="form-control" name="hba1cLevel" id="hba1cLevel" placeholder="e.g. 6.5" step="0.1" min="0" />
+                    </div>
+                    <div class="mt-3">
+                      <label class="form-label">Fasting Sugar (mg/dL)</label>
+                      <input type="number" class="form-control" name="fastingSugar" id="fastingSugar" placeholder="e.g. 110" min="0" />
+                    </div>
+                  </div>
+                </div>
+                <div class="condition-item" id="thyroidOption">
+                  <label class="health-issue-option condition-label">
+                    <input type="checkbox" name="health_thyroid" id="thyroidCheck" value="thyroid" /> Thyroid Disorder
+                  </label>
+                  <div class="condition-extra" id="thyroidFields">
+                    <div class="mt-3">
+                      <label class="form-label">Thyroid Type</label>
+                      <select class="form-select" name="thyroidType" id="thyroidType">
+                        <option value="">Select</option>
+                        <option value="hypothyroid">Hypothyroid</option>
+                        <option value="hyperthyroid">Hyperthyroid</option>
+                        <option value="autoimmune">Autoimmune</option>
+                      </select>
+                    </div>
+                    <div class="mt-3">
+                      <label class="form-label">TSH Level (mIU/L)</label>
+                      <input type="number" class="form-control" name="tshLevel" id="tshLevel" placeholder="e.g. 4.2" step="0.1" min="0" />
+                    </div>
+                  </div>
+                </div>
+                <div class="condition-item" id="pcosOption">
+                  <label class="health-issue-option condition-label">
+                    <input type="checkbox" name="health_pcos" id="pcosCheck" value="pcos" /> PCOS
+                  </label>
+                  <div class="condition-extra" id="pcosFields">
+                    <div class="mt-3">
+                      <label class="form-label">PCOS Symptoms (select all that apply)</label>
+                      <div class="health-issues-checkboxes mt-1">
+                        <label class="health-issue-option"><input type="checkbox" name="pcos_symptom" value="irregular_cycles" /> Irregular cycles</label>
+                        <label class="health-issue-option"><input type="checkbox" name="pcos_symptom" value="acne" /> Acne</label>
+                        <label class="health-issue-option"><input type="checkbox" name="pcos_symptom" value="hairfall" /> Hair fall</label>
+                        <label class="health-issue-option"><input type="checkbox" name="pcos_symptom" value="weight_gain" /> Weight gain</label>
+                      </div>
+                    </div>
+                    <div class="mt-3">
+                      <label class="form-label">Insulin Resistance</label>
+                      <select class="form-select" name="insulinResistance" id="insulinResistance">
+                        <option value="">Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="not_sure">Not sure</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <label class="health-issue-option"><input type="checkbox" name="health_bp" value="bp" /> High Blood Pressure</label>
+                <label class="health-issue-option"><input type="checkbox" name="health_cholesterol" value="cholesterol" /> High Cholesterol</label>
+                <label class="health-issue-option"><input type="checkbox" name="health_joint" value="joint" /> Joint Pain / Injury</label>
+                <label class="health-issue-option"><input type="checkbox" name="health_other" value="other" id="healthOtherCheck" /> Other</label>
+              </div>
+            </div>
+            <div class="health-other-input mt-2 d-none" id="healthOtherInput">
+              <input type="text" class="form-control" name="healthOtherText" placeholder="Please specify" data-validate="required-if-other" />
+              <span class="field-error"></span>
+            </div>
+            <span class="field-error" data-for="healthIssues"></span>
+          </div>
+          <div class="col-md-6 field-wrap" data-info="This defines the direction of your transformation.">
+            <label class="form-label">Primary Goal <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <select class="form-select" name="primaryGoal" data-validate="required">
+              <option value="">Select</option>
+              <option value="weight-loss">Lose Weight</option>
+              <option value="reduce-fat">Reduce Body Fat</option>
+              <option value="improve-energy">Improve Energy</option>
+              <option value="manage-condition">Manage a Medical Condition</option>
+              <option value="improve-fitness">Improve Overall Fitness</option>
+            </select>
+            <span class="field-error"></span>
+          </div>
+          <div class="col-md-6 field-wrap" data-info="We'll tailor meal plans to your preferences.">
+            <label class="form-label">Preferred Diet <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <select class="form-select" name="dietPreferences" id="dietSelect">
+              <option value="">Select</option>
+              <option value="vegetarian">Vegetarian</option>
+              <option value="non-vegetarian">Non-Vegetarian</option>
+              <option value="non-vegetarian">Vegan</option>
+              <option value="eggetarian">Eggetarian</option>
+            </select>
+          </div>
+          <div class="col-md-6 field-wrap" data-info="This helps us recommend sustainable intensity.">
+            <label class="form-label">Weekly Commitment <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <select class="form-select" name="commitment" data-validate="required">
+              <option value="">Select</option>
+              <option value="2-3">2–3 days per week</option>
+              <option value="4-5">4–5 days per week</option>
+              <option value="6+">6+ days per week</option>
+            </select>
+            <span class="field-error"></span>
+          </div>
+          <div class="col-md-6 field-wrap">
+            <label class="form-label">Any Allergies or Diet Restriction</label>
+            <input type="text" class="form-control" name="dietRestrictionText" id="dietRestrictionText" placeholder="e.g. nut allergy, lactose intolerance, gluten-free" />
+          </div>
+          <div class="col-12 field-wrap" data-info="Understanding this helps prevent future setbacks.">
+            <label class="form-label">Any Obstacles <span class="info-icon" tabindex="0" role="button" aria-label="More info">i</span></label>
+            <textarea class="form-control" rows="3" name="obstacles" placeholder="Any previous challenges that affected consistency?"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <div class="d-flex justify-content-end align-items-center mt-4 flex-wrap gap-2">
+        <button class="btn btn-outline me-auto" type="button" id="prevStep" style="display: none;">Back</button>
+        <button class="primary-btn" type="button" id="nextStep">Continue</button>
+        <button class="primary-btn primary-btn--disabled" type="submit" id="submitAssessment" style="display: none;" disabled>Generate my AI journey</button>
+      </div>
+    </form>
+
+    <!-- Loading overlay: 3s brain / loader then redirect -->
+    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="background: rgba(255,255,255,0.95); z-index: 9999; align-items: center; justify-content: center;">
+      <div class="text-center">
+        <div id="lottieBrain" style="width: 180px; height: 180px; margin: 0 auto;"></div>
+        <p class="mt-3 fw-600" style="color: var(--primary-indigo);">Building your journey...</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://unpkg.com/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+  <script src="assets/js/engine.js"></script>
+  <script src="assets/js/assessment.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelectorAll(".condition-item").forEach(function (item) {
+        var checkbox = item.querySelector('input[type="checkbox"]');
+        var extra = item.querySelector(".condition-extra");
+        if (!checkbox || !extra) return;
+        checkbox.addEventListener("change", function () {
+          if (this.checked) {
+            extra.classList.add("show");
+          } else {
+            extra.classList.remove("show");
+          }
+        });
+      });
+
+      var noMedicalIssues = document.getElementById("noMedicalIssues");
+      if (noMedicalIssues) {
+        noMedicalIssues.addEventListener("change", function () {
+          if (this.checked) {
+            document.querySelectorAll(".condition-extra").forEach(function (el) {
+              el.classList.remove("show");
+            });
+            document.querySelectorAll(".condition-item input[type=\"checkbox\"]").forEach(function (cb) {
+              cb.checked = false;
+            });
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

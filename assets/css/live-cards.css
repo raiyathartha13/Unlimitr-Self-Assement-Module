@@ -1,0 +1,343 @@
+/**
+ * Live Cards — Premium Score Design
+ * Smooth, animated, Freud-style score cards
+ */
+
+/* ——— Base Live Card (smooth, premium) ——— */
+.live-card {
+  position: relative;
+  width: 100%;
+  min-height: 200px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow:
+    0 2px 8px rgba(13, 50, 86, 0.04),
+    0 8px 24px rgba(13, 50, 86, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  padding: 20px 18px;
+  overflow: hidden;
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s ease;
+}
+.live-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow:
+    0 8px 16px rgba(13, 50, 86, 0.06),
+    0 24px 48px rgba(13, 50, 86, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+}
+.live-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,0.6) 0%, transparent 45%, rgba(255,255,255,0.2) 100%);
+  pointer-events: none;
+}
+
+/* Ambient glow + soft breathing pulse */
+.live-card-glow {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(ellipse at 50% 100%, var(--card-glow, rgba(46, 212, 122, 0.1)) 0%, transparent 55%);
+  pointer-events: none;
+  opacity: 0.9;
+}
+.live-card-pulse {
+  animation: live-pulse-smooth 8s ease-in-out infinite;
+}
+@keyframes live-pulse-smooth {
+  0%, 100% {
+    box-shadow:
+      0 2px 8px rgba(13, 50, 86, 0.04),
+      0 8px 24px rgba(13, 50, 86, 0.06),
+      0 0 0 1px rgba(255, 255, 255, 0.8) inset;
+  }
+  50% {
+    box-shadow:
+      0 4px 12px rgba(13, 50, 86, 0.05),
+      0 12px 36px rgba(46, 212, 122, 0.08),
+      0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+  }
+}
+
+/* Shimmer on load — smoother sweep */
+.live-card-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 30%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.4) 70%,
+    transparent 100%
+  );
+  transform: translateX(-100%) skewX(-12deg);
+  animation: live-shimmer-smooth 2.2s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+  pointer-events: none;
+}
+@keyframes live-shimmer-smooth {
+  to { transform: translateX(300%) skewX(-12deg); }
+}
+
+/* Card header */
+.live-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.live-card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary-indigo, #0D3256);
+}
+.live-card-expand {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: none;
+  background: #E8ECF0;
+  color: var(--primary-indigo);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.live-card-expand:hover {
+  background: #D8DEE4;
+  transform: scale(1.08);
+}
+
+/* ——— Half-Circle Gauge (smooth, Freud-style) ——— */
+.live-card-gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+}
+.live-gauge-svg {
+  width: 100%;
+  max-width: 140px;
+  height: 80px;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(13, 50, 86, 0.06));
+}
+.live-gauge-segment {
+  transition:
+    opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    fill 0.4s ease;
+  transform-origin: center;
+}
+.live-gauge-dotted {
+  opacity: 0.5;
+  transition: opacity 0.5s ease;
+}
+.live-card-score {
+  text-align: center;
+  margin-top: -8px;
+  animation: live-score-pop 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+@keyframes live-score-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.live-card-score-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+  display: block;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+.live-card-score-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary-indigo);
+  letter-spacing: -0.03em;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+.live-card-metrics {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(13, 50, 86, 0.06);
+}
+.live-card-metric {
+  flex: 1;
+  text-align: center;
+}
+.live-card-metric-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: 2px;
+}
+.live-card-metric-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary-indigo);
+}
+
+/* ——— 3D Gradient Bar Widget ——— */
+.live-card-bar-wrap {
+  padding: 8px 0;
+}
+.live-card-bar-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--primary-indigo);
+  margin-bottom: 8px;
+}
+.live-card-bar-track {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2ED47A 0%, #FFB547 40%, #FF7B7B 100%);
+  position: relative;
+  overflow: visible;
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.04),
+    0 1px 2px rgba(13, 50, 86, 0.04);
+  transition: box-shadow 0.4s ease;
+}
+.live-card-bar-track:hover {
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(13, 50, 86, 0.08);
+}
+.live-card-bar-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 2px 8px rgba(13, 50, 86, 0.2),
+    0 0 0 2px rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--primary-indigo);
+  z-index: 2;
+  transition: left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+.live-card-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.live-card-bar-value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary-indigo);
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* ——— Grid Layout ——— */
+.live-cards-grid-container {
+  width: 100%;
+}
+.live-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+.live-card-wrap {
+  min-height: 220px;
+  display: flex;
+}
+.live-card-wrap .live-card {
+  flex: 1;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 768px) {
+  .live-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ——— Stagger animation (GSAP target) ——— */
+.live-card-stagger {
+  opacity: 0;
+  transform: translateY(20px) scale(0.98);
+}
+
+/* ——— Count-up number (for JS) ——— */
+.live-count-up {
+  display: inline-block;
+}
+
+/* ——— Explanation variant (title top, gauge, explanation bottom) ——— */
+.live-card--with-explanation .live-card-explanation {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--text-muted, #64748b);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(13, 50, 86, 0.06);
+  animation: live-explanation-fade 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both;
+}
+@keyframes live-explanation-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.live-card--with-explanation .live-card-gauge-wrap { min-height: 90px; }
+.live-card--with-explanation .live-card-header { margin-bottom: 8px; }
+.live-card--with-explanation { min-height: 220px; }
+
+/* ——— 2-card layout (50% each desktop) ——— */
+.live-cards-two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .live-cards-two-col { grid-template-columns: 1fr 1fr; }
+}
+
+/* ——— 4-card What's Driving grid (2 per row on desktop) ——— */
+.live-cards-four-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .live-cards-four-col { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ——— Section spacing (no extra gap) ——— */
+.dashboard-card + .dashboard-card { margin-top: 20px; }
+.dashboard-container .dashboard-card:first-of-type { margin-top: 0; }
+.health-insights-card { padding: 4px 0; }
+.health-insights-card p { margin-bottom: 0; }

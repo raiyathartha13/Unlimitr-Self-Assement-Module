@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "identity": {
+    "tone": "clinical_compassionate",
+    "never": ["fear_based", "shaming", "aggressive_sales"],
+    "always": ["empowering", "data_backed", "reversible_language"]
+  },
+  "scoringWeights": {
+    "metabolic": 0.30,
+    "hormonal": 0.20,
+    "behavioral": 0.20,
+    "recovery": 0.15,
+    "riskMomentum": 0.15
+  },
+  "riskZones": [
+    { "min": 0, "max": 30, "label": "Metabolic Strain", "color": "deep_red" },
+    { "min": 31, "max": 55, "label": "Adaptive Stress", "color": "amber" },
+    { "min": 56, "max": 75, "label": "Stabilizing", "color": "teal" },
+    { "min": 76, "max": 90, "label": "Structured Green", "color": "green" },
+    { "min": 91, "max": 100, "label": "Resilient", "color": "emerald" }
+  ],
+  "behaviorTypes": {
+    "A": "High Motivation / Low Discipline",
+    "B": "Emotional Eating Triggered",
+    "C": "Overtrained / Under-recovered",
+    "D": "Start-Stop Pattern",
+    "E": "High Compliance Candidate"
+  },
+  "conditionRules": {
+    "thyroid": {
+      "tshHigh": 4,
+      "tshVeryHigh": 8,
+      "message": "Your metabolism is conserving energy — not failing."
+    },
+    "diabetes": {
+      "preDiabetic": 6.0,
+      "diabetic": 6.5,
+      "message": "Your glucose curve shows prolonged elevation. Structured carb timing can reverse this trajectory."
+    },
+    "pcos": {
+      "cluster": "cycle_irregular + insulin_resistance",
+      "message": "Your hormonal rhythm is desynchronized. With cycle-synced correction, this can be stabilized."
+    }
+  },
+  "planLogic": {
+    "lowScore": { "max": 50, "recommend": "6-12 months structured correction" },
+    "midScore": { "max": 70, "recommend": "3-6 months structured plan" },
+    "highScore": { "max": 100, "recommend": "performance optimization" }
+  },
+  "reportTemplate": {
+    "opening": "Your biology is responding to signals — not failing.",
+    "reversibility": "With structured correction, this can improve steadily.",
+    "confidence": "Your trajectory can move toward 85+ within 12–16 weeks."
+  }
+}

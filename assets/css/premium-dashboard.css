@@ -1,0 +1,468 @@
+/**
+ * Premium Dashboard — Glass, depth, ambient micro-interactions
+ * Apple Health / Tesla OS aesthetic
+ * PHASE 1: Static layout foundation (animations disabled until stable)
+ */
+
+/* ——— UNLIMITR AI Cognitive Backbone — Risk Gradient ——— */
+.risk-gauge-glow { box-shadow: 0 0 24px var(--risk-glow, rgba(46,212,122,0.2)); transition: box-shadow 1.2s ease; }
+.risk-gauge-pulse { animation: risk-pulse 6s ease-in-out infinite; }
+@keyframes risk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.92; } }
+.risk-shimmer { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); background-size: 200% 100%; animation: risk-shimmer 4s ease-in-out infinite; }
+@keyframes risk-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+/* ——— Genie AI Health Dashboard ——— */
+.genie-first-fold {
+  min-height: calc(100vh - 80px);
+}
+.genie-hero .pill {
+  background: linear-gradient(135deg, rgba(46, 212, 122, 0.15), rgba(0, 191, 166, 0.12));
+  color: var(--spanish-green);
+}
+
+/* Glass card gradients (reference: ClyHealth / Apple Health) */
+.genie-card-gradient-1 { background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.9) 100%) !important; }
+.genie-card-gradient-2 { background: linear-gradient(135deg, rgba(248,250,252,0.95) 0%, rgba(241,245,249,0.9) 100%) !important; }
+.genie-card-gradient-score { background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(246,253,249,0.6) 100%) !important; }
+.genie-card-gradient-metric { background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.85) 100%) !important; }
+
+/* Metric range bar (Optimal / Suboptimal / Critical) */
+.genie-range-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #FF4D4D 0%, #FFB547 35%, #2ED47A 70%, #6EF3A5 100%);
+  position: relative;
+  overflow: visible;
+}
+.genie-range-marker {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 14px;
+  background: #0D3256;
+  border-radius: 1px;
+  transform: translateX(-50%);
+  transition: left 0.5s ease;
+}
+.genie-metric-card {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(13,50,86,0.06);
+  min-height: 90px;
+}
+.genie-metric-value { font-size: 1.25rem; font-weight: 700; color: var(--primary-indigo); }
+.genie-metric-status { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.genie-metric-status--optimal { color: #2ED47A; }
+.genie-metric-status--suboptimal { color: #FFB547; }
+.genie-metric-status--critical { color: #FF4D4D; }
+
+.ai-summary-card {
+  min-height: 180px;
+  padding: 20px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.6);
+}
+.ai-summary-card__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-indigo);
+  margin-bottom: 12px;
+}
+.ai-summary-card__text {
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+/* ——— Layout Stabilization (Fix 1) ——— */
+.glass-card {
+  min-height: 180px;
+  position: relative;
+  overflow: hidden;
+}
+.metric-card {
+  min-height: 220px;
+}
+.dashboard-section {
+  margin-bottom: 32px;
+}
+/* Flex stretch for equal column height (Fix 4) */
+.health-summary-section .row.align-items-stretch > [class*="col-"] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ——— Semi-wrapper for arc (Fix 5) ——— */
+.semi-wrapper,
+.premium-score-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+  min-height: 140px;
+}
+
+/* ——— Glass + Depth System ——— */
+.premium-glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  box-shadow:
+    0 4px 24px rgba(13, 50, 86, 0.04),
+    0 0 0 1px rgba(13, 50, 86, 0.04) inset;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.premium-glass-card:hover {
+  transform: perspective(1000px) translateY(-2px);
+  box-shadow:
+    0 12px 40px rgba(13, 50, 86, 0.06),
+    0 0 0 1px rgba(13, 50, 86, 0.04) inset;
+}
+
+/* ——— Nutrition-style Metabolic Health Score Card ——— */
+.nutrition-score-container {
+  min-height: 280px;
+  align-items: stretch;
+}
+.nutrition-style-score-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+.nutrition-score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.nutrition-score-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary-indigo);
+}
+.nutrition-score-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nutrition-expand-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: #E8ECF0;
+  color: var(--primary-indigo);
+  font-size: 14px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s;
+}
+.nutrition-expand-btn:hover {
+  background: #D8DEE4;
+  transform: scale(1.05);
+}
+.nutrition-gauge-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.nutrition-gauge-svg {
+  display: block;
+  max-width: 260px;
+  height: 120px;
+}
+.nutrition-dotted-line {
+  opacity: 0.6;
+}
+.nutrition-score-display {
+  text-align: center;
+  margin-top: -12px;
+}
+.nutrition-score-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.nutrition-score-pct {
+  display: block;
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--primary-indigo);
+  letter-spacing: -0.03em;
+}
+.nutrition-metrics-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(13, 50, 86, 0.06);
+}
+.nutrition-metric {
+  flex: 1;
+  text-align: center;
+}
+.nutrition-metric-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}
+.nutrition-metric-value {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary-indigo);
+}
+
+/* ——— Main Health Score Card (legacy) ——— */
+.premium-score-card {
+  position: relative;
+  padding: 32px 24px 28px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 32px rgba(13, 50, 86, 0.06);
+  overflow: visible;
+  min-height: 220px;
+}
+.premium-score-glow {
+  position: absolute;
+  inset: -30%;
+  background: radial-gradient(circle at 50% 100%, rgba(0, 191, 166, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.premium-score-particles {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.premium-score-arc,
+.premium-score-svg {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: 140px;
+  margin: 0 auto;
+}
+.premium-score-value {
+  text-align: center;
+  margin-top: -8px;
+}
+.premium-score-num {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary-indigo);
+  letter-spacing: -0.03em;
+}
+.premium-score-max {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+.premium-score-insight {
+  max-width: 280px;
+  margin: 16px auto 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ——— Semi-Circle Cards (BMI, Metabolic Age, Risk) ——— */
+.premium-semi-card {
+  position: relative;
+  padding: 20px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 16px rgba(13, 50, 86, 0.04);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  min-height: 160px;
+}
+.premium-semi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(13, 50, 86, 0.06);
+}
+.premium-semi-pulse {
+  animation: premium-pulse 5s ease-in-out infinite;
+}
+.premium-semi-risk-glow {
+  background: linear-gradient(180deg, rgba(255, 77, 77, 0.04) 0%, rgba(255, 255, 255, 0.9) 100%) !important;
+}
+@keyframes premium-pulse {
+  0%, 100% { box-shadow: 0 2px 16px rgba(13, 50, 86, 0.04); }
+  50% { box-shadow: 0 2px 24px rgba(255, 77, 77, 0.12); }
+}
+.premium-semi-arc {
+  display: block;
+  width: 100%;
+  max-width: 100px;
+  height: 60px;
+  margin: 0 auto;
+}
+.premium-semi-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary-indigo);
+  text-align: center;
+  margin-top: -4px;
+}
+.premium-semi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+.premium-semi-tooltip-wrap {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+.premium-semi-tooltip-wrap .journey-tooltip-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+}
+.premium-semi-tooltip-wrap .journey-tooltip-bubble {
+  left: auto;
+  right: 0;
+  transform: translateY(6px);
+}
+.premium-semi-tooltip-wrap.tooltip-open .journey-tooltip-bubble {
+  transform: translateY(8px) scale(1);
+}
+
+/* ——— Adaptive Curve ——— */
+.adaptive-curve-wrap {
+  position: relative;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 16px;
+  box-shadow: 0 2px 16px rgba(13, 50, 86, 0.04);
+}
+.adaptive-curve-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.adaptive-curve-wrap {
+  min-height: 220px;
+}
+.adaptive-curve-canvas {
+  display: block;
+  width: 100%;
+  max-width: 380px;
+  height: 200px;
+}
+
+/* ——— Recalibration Core ——— */
+.recalibration-core-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+}
+.recalibration-canvas {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.recalibration-center {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.recalibration-ring {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 1px solid rgba(46, 212, 122, 0.3);
+  will-change: transform;
+}
+.recalibration-orb {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(46, 212, 122, 0.25);
+  border: 2px solid rgba(46, 212, 122, 0.4);
+  position: relative;
+  z-index: 1;
+}
+@keyframes recal-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.recalibration-label {
+  margin-top: 12px;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+}
+
+/* ——— Recalibration placement ——— */
+.recalibration-placement {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+}
+
+/* ——— AI Radar ——— */
+.ai-radar-wrap {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 16px;
+  box-shadow: 0 2px 16px rgba(13, 50, 86, 0.04);
+}
+.ai-radar-wrap {
+  min-height: 260px;
+}
+.ai-radar-wrap canvas,
+.ai-radar-wrap .ai-radar-sweep-svg {
+  display: block;
+  margin: 0 auto;
+  width: 200px;
+  height: 200px;
+}
+.ai-radar-sweep-svg {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.ai-radar-canvas {
+  position: relative;
+  z-index: 1;
+}
+.ai-radar-sweep-svg {
+  z-index: 2;
+}

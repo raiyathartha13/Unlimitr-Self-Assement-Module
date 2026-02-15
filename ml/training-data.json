@@ -1,0 +1,72 @@
+[
+  {
+    "input": {
+      "bmi": 32,
+      "sleep": 1,
+      "stress": 3,
+      "activity": 1,
+      "tsh": 5.2
+    },
+    "output": {
+      "metabolicScore": 48,
+      "behaviorType": "D",
+      "riskZone": "Adaptive Stress"
+    }
+  },
+  {
+    "input": {
+      "bmi": 24,
+      "sleep": 3,
+      "stress": 1,
+      "activity": 3,
+      "tsh": 2.1
+    },
+    "output": {
+      "metabolicScore": 82,
+      "behaviorType": "E",
+      "riskZone": "Structured Green"
+    }
+  },
+  {
+    "input": {
+      "bmi": 28,
+      "sleep": 2,
+      "stress": 2,
+      "activity": 2,
+      "tsh": 3.5
+    },
+    "output": {
+      "metabolicScore": 62,
+      "behaviorType": "A",
+      "riskZone": "Stabilizing"
+    }
+  },
+  {
+    "input": {
+      "bmi": 35,
+      "sleep": 1,
+      "stress": 3,
+      "activity": 1,
+      "tsh": 7.2
+    },
+    "output": {
+      "metabolicScore": 35,
+      "behaviorType": "B",
+      "riskZone": "Metabolic Strain"
+    }
+  },
+  {
+    "input": {
+      "bmi": 22,
+      "sleep": 3,
+      "stress": 1,
+      "activity": 3,
+      "tsh": 1.8
+    },
+    "output": {
+      "metabolicScore": 92,
+      "behaviorType": "E",
+      "riskZone": "Resilient"
+    }
+  }
+]

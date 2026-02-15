@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unlock your plan — Unlimitr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/theme.css" rel="stylesheet" />
+</head>
+<body data-page="offer">
+  <main class="app-shell">
+    <header class="hero">
+      <img class="logo" src="https://unlimitr.com/img/hca_logo.svg" alt="Unlimitr">
+      <div class="pill">Limited plan upgrade</div>
+      <h1>Unlock your AI transformation plan</h1>
+      <p>Premium coaching, personalized nutrition, and daily accountability.</p>
+    </header>
+
+    <p class="text-center mb-4 fw-600" style="color: var(--primary-indigo); font-size: 18px;">You're not buying a diet. You're committing to your future self.</p>
+
+    <section class="offer-card mb-4 position-relative">
+      <span class="badge-50">50% OFF</span>
+      <div id="medicalPlanBlock" class="d-none">
+        <div class="glass-section-title" id="offerPlanTitle">Medical Supervised Plan</div>
+        <p class="muted" id="offerPlanFocus">Supervised fat loss with medical-grade safety and monitoring.</p>
+        <ul class="muted" id="offerPlanBullets"></ul>
+      </div>
+      <div id="standardPlanBlock">
+        <div class="glass-section-title" id="offerPlanTitleStd">Fitstart Total Wellness Plan</div>
+        <p class="muted" id="offerPlanFocusStd">Full-body reset with holistic fat-loss support.</p>
+        <ul class="muted" id="offerPlanBulletsStd"></ul>
+      </div>
+      <div id="offerDurationBadge" class="mt-2 mb-2" style="font-size: 0.95rem; color: var(--primary-indigo); font-weight: 600;">12 weeks • Built for your goals</div>
+      <div class="row g-4 align-items-center mt-3">
+        <div class="col-md-7">
+          <ul class="list-unstyled muted mb-0">
+            <li class="mb-2">Weekly roadmap</li>
+            <li class="mb-2">Diet personalization</li>
+            <li class="mb-2">AI nudges</li>
+            <li class="mb-2">WhatsApp accountability</li>
+            <li class="mb-2">Monthly coach call</li>
+          </ul>
+        </div>
+        <div class="col-md-5 text-center">
+          <div class="muted">Partner price</div>
+          <div class="fs-2 fw-bold" style="color: var(--spanish-green);" id="offerPrice">₹7,999</div>
+          <div class="price-strike" id="offerPriceStrike">₹15,999</div>
+          <div class="countdown mt-2">Offer ends in <span id="offerTimer">15:00</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass-card mb-4" id="offerReasonBlock">
+      <div class="glass-section-title">Why we chose this plan for you</div>
+      <p id="offerReason" class="muted mb-0">Based on your profile, goals, and commitment, our AI has matched you with the right program length and plan.</p>
+    </section>
+
+    <section class="glass-card mb-4">
+      <div class="glass-section-title">Why this works</div>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="glass-card h-100">
+            <div class="fw-bold">Science-first</div>
+            <p class="muted mb-0">BMR, BMI, and lifestyle signals optimized weekly.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="glass-card h-100">
+            <div class="fw-bold">Coach-led</div>
+            <p class="muted mb-0">Human accountability layered with AI intelligence.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="glass-card h-100">
+            <div class="fw-bold">Outcome-based</div>
+            <p class="muted mb-0">Tracked milestones and measurable fat loss progression.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="text-center">
+      <a class="primary-btn text-decoration-none" href="#" id="stripeCta">Proceed to Stripe Checkout</a>
+      <div class="trust-note">Refundable within 7 days • Cancel anytime</div>
+    </div>
+  </main>
+
+  <script src="assets/js/engine.js"></script>
+  <script src="assets/js/offer.js"></script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Genie AI Health Dashboard — Unlimitr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/theme.css" rel="stylesheet" />
+  <link href="assets/css/dashboard.css" rel="stylesheet" />
+  <link href="assets/css/premium-dashboard.css" rel="stylesheet" />
+  <link href="assets/css/live-cards.css" rel="stylesheet" />
+  <style>
+    #bodyMorphContainer { width: 100%; height: 320px; border-radius: 16px; overflow: hidden; background: linear-gradient(180deg, rgba(245,242,239,0.5) 0%, rgba(241,218,204,0.5) 100%); }
+    .body-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+    .body-svg { width: 120px; height: auto; max-height: 260px; }
+    .gauge-circle { transition: stroke-dasharray 0.8s ease; }
+    .health-score-gauge { max-width: 220px; width: 100%; margin: 0 auto; }
+    .journey-blur-wrap { position: relative; transition: filter 0.5s ease; }
+    .journey-blur-wrap.journey-blurred { filter: blur(8px); pointer-events: none; user-select: none; }
+    .journey-unlock-overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 9999; background: rgba(0,0,0,0.35); backdrop-filter: blur(4px); transition: opacity 0.5s ease, visibility 0.5s ease; }
+    .journey-unlock-overlay.journey-unlocked { opacity: 0; visibility: hidden; pointer-events: none; }
+    .journey-unlock-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; padding: 32px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 24px 64px rgba(13, 50, 86, 0.2); }
+    .journey-unlock-card .otp-section { display: none; }
+    .journey-unlock-card.otp-mode .mobile-section { display: none; }
+    .journey-unlock-card.otp-mode .otp-section { display: block; }
+    .risk-tag { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 6px 14px; border-radius: 999px; }
+    .risk-tag--low { background: rgba(0, 137, 68, 0.15); color: var(--spanish-green); }
+    .risk-tag--moderate { background: rgba(255, 195, 5, 0.25); color: #996600; }
+    .risk-tag--high { background: rgba(255, 10, 10, 0.15); color: var(--dark-pastel-red); }
+    .risk-tag--elevated { background: rgba(255, 195, 5, 0.3); color: #996600; }
+    .root-cause-bar { height: 10px; border-radius: 999px; background: rgba(13, 50, 86, 0.08); overflow: hidden; }
+    .root-cause-bar__fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--spanish-green), var(--blue-gray)); transition: width 1s ease; }
+    .root-cause-bar-wave { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--spanish-green), var(--blue-gray)); background-size: 200% 100%; animation: wave-fill 3s ease-in-out infinite; }
+    .recovery-battery { height: 10px; border-radius: 999px; background: rgba(13, 50, 86, 0.08); overflow: hidden; position: relative; }
+    .recovery-battery__fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--spanish-green), var(--blue-gray)); box-shadow: 0 0 12px rgba(0, 137, 68, 0.3); transition: width 1s ease; }
+    .bmi-silhouette-fill { height: 4px; border-radius: 999px; background: linear-gradient(90deg, var(--spanish-green), var(--earth-yellow), var(--dark-pastel-red)); transition: width 1s ease; }
+    @keyframes wave-fill { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+    .section-fade { opacity: 0; transform: translateY(16px); }
+    .condition-modal { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; }
+    .condition-modal__card { background: var(--card-bg); border-radius: var(--radius); padding: 32px; max-width: 420px; width: 90%; box-shadow: 0 24px 64px rgba(13, 50, 86, 0.2); }
+    #unlockCountryCode {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      width: 4.5rem;
+      min-width: 4.5rem;
+      padding-right: 0.75rem;
+      box-sizing: border-box;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230D3256' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.35rem center;
+      background-size: 0.5rem;
+    }
+    .per-day-badge { font-size: 14px; color: var(--spanish-green); font-weight: 600; }
+    .hero .logo { display: block; margin-left: auto; margin-right: auto; }
+    /* Journey tooltips — glass, fade, scale (scoped to journey page) */
+    .journey-tooltip-wrap { position: relative; display: inline-flex; align-items: center; }
+    .journey-tooltip-icon { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--primary-indigo); color: #fff; font-size: 11px; font-weight: 600; font-style: italic; cursor: pointer; margin-left: 6px; transition: transform 0.2s; }
+    .journey-tooltip-icon:hover { transform: scale(1.1); }
+    .journey-tooltip-bubble { position: absolute; left: 50%; top: 100%; transform: translateX(-50%) translateY(6px); padding: 12px 16px; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-radius: 12px; box-shadow: 0 8px 24px rgba(13,50,86,0.15); font-size: 13px; line-height: 1.5; color: var(--primary-indigo); min-width: 220px; max-width: 320px; z-index: 100; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.2s, transform 0.2s; }
+    .journey-tooltip-wrap.tooltip-open .journey-tooltip-bubble { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(8px) scale(1); }
+    /* Root cause breakdown accordion */
+    .root-cause-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 16px 20px; margin-bottom: 12px; border-left: 4px solid var(--spanish-green); cursor: pointer; transition: box-shadow 0.2s, transform 0.2s; }
+    .root-cause-card:hover { box-shadow: var(--card-shadow); transform: translateY(-2px); }
+    .root-cause-card .card-toggle { display: flex; align-items: center; justify-content: space-between; }
+    .root-cause-card .card-expand { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.3s ease, opacity 0.3s ease; }
+    .root-cause-card.show .card-expand { max-height: 200px; opacity: 1; }
+    .root-cause-card .card-expand-inner { padding-top: 12px; font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+    /* Projection cards */
+    .projection-card { padding: 20px; border-radius: var(--radius); border: 1px solid var(--card-border); min-height: 140px; }
+    .projection-card--warning { background: rgba(255, 107, 107, 0.06); border-color: rgba(255, 107, 107, 0.15); }
+    .projection-card--success { background: rgba(0, 191, 166, 0.06); border-color: rgba(0, 191, 166, 0.15); }
+    .projection-card ul { margin: 0; padding-left: 20px; font-size: 14px; color: var(--text-muted); }
+    /* Conversion section badges */
+    .conversion-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 999px; margin: 4px; background: rgba(0, 137, 68, 0.12); color: var(--spanish-green); }
+    .journey-section-animate { opacity: 0; transform: translateY(20px); }
+    .glass-card.journey-hover:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(13, 50, 86, 0.12); transition: transform 0.2s, box-shadow 0.2s; }
+    /* Ambient living system */
+    .ai-core-wrap { position: relative; transform-style: preserve-3d; }
+    .ai-core { will-change: transform; }
+    .ai-core-glow { position: absolute; inset: -12px; border-radius: 50%; background: radial-gradient(circle, rgba(0, 137, 68, 0.15) 0%, transparent 70%); opacity: 0; pointer-events: none; }
+    .data-ring { transform-origin: 60px 60px; }
+    .score-shimmer { position: absolute; top: 0; left: 0; width: 30%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); transform: translateX(-100%); pointer-events: none; }
+    .dashboard-card { transform-style: preserve-3d; will-change: transform; transition: box-shadow 0.3s; }
+    .neural-bg { overflow: visible; }
+    .neural-bg path { stroke-dasharray: 4 8; }
+    .condition-glow-wrap { position: relative; }
+    .condition-glow { position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(ellipse at 50% 50%, rgba(0, 137, 68, 0.08) 0%, transparent 70%); opacity: 0; pointer-events: none; }
+    .typewriter-cursor { color: var(--spanish-green); font-weight: 300; }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(200%); } }
+    .health-xp-bar { max-width: 200px; margin: 0 auto; }
+    .health-xp-track { height: 6px; border-radius: 999px; background: rgba(13,50,86,0.1); overflow: hidden; }
+    .health-xp-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--spanish-green), var(--blue-gray)); transition: width 0.6s ease; }
+    .body-region-hover-pulse { animation: region-pulse 0.6s ease-out; }
+    @keyframes region-pulse { 0% { filter: drop-shadow(0 0 0 transparent); } 50% { filter: drop-shadow(0 0 12px var(--spanish-green)); } 100% { filter: drop-shadow(0 0 0 transparent); } }
+    .risk-radar-svg .radar-polygon { transform-origin: 100px 100px; }
+    .behavior-gauge-wrap { text-align: center; }
+    .behavior-gauge { width: 80px; height: 80px; display: block; margin: 0 auto; transform: rotate(-90deg); }
+    .behavior-gauge .gauge-bg { fill: none; stroke: rgba(13,50,86,0.1); stroke-width: 6; }
+    .behavior-gauge .gauge-fill { fill: none; stroke: var(--spanish-green); stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray 0.8s ease; }
+    .behavior-gauge .gauge-fill.plateau { stroke: var(--earth-yellow); }
+    .behavior-gauge .gauge-fill.relapse { stroke: var(--dark-pastel-red); }
+    .timeline-spine { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .timeline-spine-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(13,50,86,0.2); transition: all 0.3s; }
+    .timeline-spine-dot.active { background: var(--spanish-green); box-shadow: 0 0 12px rgba(0,137,68,0.5); transform: scale(1.2); }
+    .timeline-week { font-size: 10px; color: var(--text-muted); display: block; margin-top: 2px; }
+    .morph-body-svg g { transition: opacity 0.5s ease; }
+    /* Anatomical body transformation */
+    .morph-engine-container { width: 100%; }
+    .morph-engine-container.morph-uses-image { background: #0a0a0a; border-radius: 16px; min-height: 220px; }
+    .morph-anatomical-wrap { width: 100%; height: 100%; min-height: 220px; display: flex; align-items: flex-end; justify-content: center; padding: 20px; }
+    .morph-body-anatomical { max-height: 280px; width: auto; object-fit: contain; object-position: center bottom; transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); transform-origin: 50% 100%; }
+    #fatFitMorphContainer .morph-uses-image { border-radius: 16px; }
+  </style>
+</head>
+<body data-page="journey">
+  <main class="app-shell">
+    <div class="dashboard-container">
+      <header class="hero genie-hero">
+        <img class="logo" src="https://unlimitr.com/img/hca_logo.svg" alt="Unlimitr">
+        <div class="pill">Genie AI Health Dashboard</div>
+        <h1>Your Transformation Dashboard</h1>
+        <p>Live insights, personalized roadmap, and AI coach guidance.</p>
+      </header>
+
+      <!-- Zone 2 — Centerpiece Hologram + Intelligence (First fold) -->
+      <section class="dashboard-card glass-card genie-card-gradient-1 zone-2-centerpiece" id="biologicalAvatarSection">
+        <div class="card-header">
+          <h2 class="card-title">Biological Impact Map</h2>
+        <p class="muted small mb-0">The highlighted areas represent metabolic stress zones. These are adaptive responses — not failures.</p>
+        </div>
+        <div class="row g-4 align-items-stretch">
+          <div class="col-lg-6">
+            <div class="hologram-wrap" style="position:relative;">
+              <div id="recalibrationContainer" class="recalibration-placement"></div>
+              <div id="hologramContainer" class="hologram-canvas" aria-hidden="true"></div>
+              <div id="bodyMorphContainer" class="avatar-canvas avatar-fallback d-flex justify-content-center align-items-center"></div>
+              <span class="ai-recalibrating-label">AI recalibrating…</span>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="intelligence-cards-stack">
+              <div class="intelligence-card">
+                <h3 class="intelligence-card__title">Transformation Progress</h3>
+                <div class="root-cause-bar"><div class="root-cause-bar__fill" id="timelinePreviewBar" style="width: 0%;"></div></div>
+                <div class="small muted mt-1">Week 0 → Week 12 — Scroll to evolve</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Your Health Insights — merged counsellor + AI insights -->
+      <section class="dashboard-card glass-card genie-card-gradient-score journey-section-animate" id="healthInsightsSection">
+        <div class="card-header">
+          <h2 class="card-title">Your Health Insights</h2>
+        </div>
+        <div class="health-insights-card">
+          <p id="healthInsightsText" class="muted mb-0" style="line-height: 1.7; font-size: 15px;"></p>
+        </div>
+      </section>
+
+    <!-- Live Health Metrics — Semi-circle cards -->
+    <section class="dashboard-card glass-card genie-card-gradient-metric journey-section-animate" id="liveCardsGridSection">
+      <div class="card-header">
+        <h2 class="card-title">Live Health Metrics</h2>
+        <p class="muted small mb-0">Real-time insights with AI-driven recalibration</p>
+      </div>
+      <div id="liveCardsGrid" class="live-cards-grid-container"></div>
+    </section>
+
+    <!-- First fold ends here. Blurred content below (revealed after OTP) -->
+    <div class="journey-blur-wrap journey-blurred" id="journeyBlurWrap">
+
+    <!-- AI Body Risk Radar -->
+    <section class="dashboard-card glass-card genie-card-gradient-metric dashboard-section radar-section journey-section-animate" id="riskRadarSection">
+      <div class="card-header">
+        <h2 class="card-title">Risk Distribution Overview</h2>
+      </div>
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div id="aiRadarContainer"></div>
+          <div id="riskRadarContainer" style="display:none;"></div>
+          <p class="text-center small muted mt-2" id="riskRadarStatus"></p>
+        </div>
+        <div class="col-md-6">
+          <p class="muted small mb-0">Your risk is not concentrated in one system — it is distributed across metabolic and recovery pathways. This pattern is common in individuals balancing work stress and inconsistent recovery. Hover axes for details.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Emotional Lock-in -->
+    <section class="dashboard-card glass-card lock-in-section journey-section-animate" id="emotionalLockInSection">
+      <div class="text-center py-4">
+        <div class="mb-2">
+          <span id="lockInScoreFrom" class="fs-3 fw-bold" style="color: var(--dark-pastel-red);">54</span>
+          <span class="mx-2">→</span>
+          <span id="lockInScoreTo" class="fs-3 fw-bold" style="color: var(--spanish-green);">85</span>
+        </div>
+        <p id="lockInMessage" class="muted mb-4" style="font-size: 1.1rem; line-height: 1.7;"></p>
+        <a href="offer.html" class="primary-btn px-5 py-3" id="lockInCta">Unlock My Transformation</a>
+      </div>
+    </section>
+
+    <!-- Condition-Specific Data -->
+    <section class="dashboard-card glass-card genie-card-gradient-metric condition-section" id="conditionBlock">
+      <div class="card-header">
+        <h2 class="card-title">Biomarkers & Condition Profile</h2>
+      </div>
+      <div id="genieConditionMetrics" class="row g-3 mb-4"></div>
+      <div id="conditionContent"></div>
+      <div id="conditionIntelligencePanel" class="mt-4"></div>
+    </section>
+
+    <!-- What's Driving Your Current Health Status — 4 semi-circle cards -->
+    <section class="dashboard-card glass-card root-cause-detail-section journey-section-animate" id="rootCauseSection">
+      <div class="card-header">
+        <h2 class="card-title">What's Driving Your Current Health Status</h2>
+      </div>
+      <div id="rootCauseCardsGrid" class="live-cards-four-col"></div>
+    </section>
+
+    <!-- Projected Metabolic Trajectory & Calorie Engine — Wave-like graph -->
+    <section class="dashboard-card glass-card simulation-section journey-section-animate" id="projectionSection">
+      <div class="card-header">
+        <h2 class="card-title">Projected Metabolic Trajectory & Calorie Engine</h2>
+        <p class="muted small mb-0">Human progress is never a straight line. This wave reflects natural fluctuation — metabolic adaptation, hormonal shifts, and sustainable change.</p>
+      </div>
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="mb-2 d-flex align-items-center gap-1"><span>Adaptive Fat Loss Curve</span><div class="journey-tooltip-wrap"><span class="journey-tooltip-icon" tabindex="0" role="button" aria-label="Info">i</span><div class="journey-tooltip-bubble">Projected weight over time. Every 4 weeks the rate slows 5% to preserve hormonal stability — curved, not linear.</div></div></div>
+          <p class="muted small mb-2">Every 4 weeks: 5% reduction in loss rate. Curved, not linear.</p>
+          <div id="adaptiveCurveContainer"></div>
+          <canvas id="weightChart" height="180" style="display:none;"></canvas>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-2 d-flex align-items-center gap-1"><span>Calorie Engine</span><div class="journey-tooltip-wrap"><span class="journey-tooltip-icon" tabindex="0" role="button" aria-label="Info">i</span><div class="journey-tooltip-bubble">TDEE = Total Daily Energy Expenditure. BMR + NEAT + TEF + Exercise. 80% of burn happens without exercise — metabolism optimization is critical.</div></div></div>
+          <p class="muted small mb-2">TDEE and recommended intake for metabolic safety.</p>
+          <canvas id="calorieChart" height="180"></canvas>
+          <p class="muted small mt-2 mb-0" id="calorieNote">80% of your calorie burn happens without exercise. This is why metabolism optimization is critical.</p>
+        </div>
+      </div>
+      <div class="metabolic-safety-card">
+        <div class="metabolic-safety-card__title">Metabolic Safety</div>
+        <p class="muted small mb-2" id="tdeeText">—</p>
+        <p class="muted small mb-0" id="recommendedIntakeText">—</p>
+      </div>
+    </section>
+
+    <!-- Trajectory Comparison — 2 cards 50% each (circle top, title, explanation bottom) -->
+    <section class="dashboard-card glass-card projection-section journey-section-animate" id="projectionEngineSection">
+      <div class="card-header">
+        <h2 class="card-title">Trajectory Comparison</h2>
+        <p class="muted small mb-0">A contrast between likely outcomes — not fear, just clarity.</p>
+      </div>
+      <div id="trajectoryTwoCards" class="live-cards-two-col"></div>
+    </section>
+
+    <!-- Conversion Section -->
+    <section class="dashboard-card glass-card conversion-section journey-section-animate" id="conversionSection">
+      <div class="card-header">
+        <h2 class="card-title">Your Personalized Transformation Blueprint Is Ready</h2>
+      </div>
+      <div class="mb-3">
+        <div class="fw-600 mb-2" id="conversionPlanName">—</div>
+        <p class="muted small mb-2" id="conversionPlanDuration">—</p>
+        <p class="muted small mb-2" id="conversionExpectedLoss">—</p>
+        <p class="muted small mb-3" id="conversionScoreImprovement">—</p>
+        <div class="mb-3">
+          <span class="conversion-badge">Money-back guarantee</span>
+          <span class="conversion-badge">Doctor-led</span>
+          <span class="conversion-badge">100,000+ clients</span>
+        </div>
+      </div>
+      <div class="d-flex flex-wrap gap-2 justify-content-center">
+        <button type="button" class="primary-btn px-4 py-2" id="ctaUnlockPlan">Unlock My Structured Plan</button>
+        <button type="button" class="btn btn-outline px-4 py-2" id="cta90Day">Start My 90-Day Reset</button>
+        <button type="button" class="btn btn-outline px-4 py-2" id="ctaMetabolism">Fix My Metabolism</button>
+      </div>
+    </section>
+
+    <!-- Final CTA (bottom only, kept for backwards compat) -->
+    <div class="final-cta text-center mt-5 mb-4">
+      <button type="button" class="primary-btn px-5 py-3" id="goToOffer">View My Recommended Plan</button>
+    </div>
+
+    </div>
+    </div>
+  </main>
+
+  <!-- Condition Data Modals (Diabetes, Thyroid, PCOS) -->
+  <div id="conditionModalWrap"></div>
+
+  <!-- Unlock Overlay: Mobile + OTP required to view full report (reused flow) -->
+  <div class="journey-unlock-overlay" id="unlockOverlay" style="display: flex; visibility: visible; opacity: 1;">
+    <div class="journey-unlock-card" id="unlockCard">
+      <span class="d-inline-block small fw-600 text-uppercase px-3 py-1 rounded-pill mb-2" style="background: rgba(0, 137, 68, 0.15); color: var(--spanish-green);">Exclusive Access</span>
+      <h2 class="h5 fw-bold mb-2" style="color: var(--primary-indigo);">Unlock Your Full Genie AI Report</h2>
+      <p class="muted mb-3" style="font-size: 14px;">Verify your mobile number to view your complete health blueprint and enjoy an additional 10% off on your personalized plan.</p>
+      <div class="mobile-section">
+        <label class="form-label small fw-600 mb-1">Mobile number <span class="text-danger">*</span></label>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <select id="unlockCountryCode" class="form-select">
+            <option value="+91" selected>+91</option>
+            <option value="+1">+1</option>
+            <option value="+44">+44</option>
+            <option value="+971">+971</option>
+            <option value="+61">+61</option>
+          </select>
+          <input type="tel" class="form-control flex-fill" id="unlockMobile" placeholder="10-digit mobile number" maxlength="10" required />
+        </div>
+        <div class="small text-danger mb-2" id="unlockMobileError"></div>
+        <button type="button" class="btn w-100 mt-2" id="sendOtpBtn" style="background: var(--spanish-green); color: #fff;">Unlock &amp; Get 10% Off</button>
+      </div>
+      <div class="otp-section">
+        <label class="form-label small fw-600 mb-1">OTP <span class="text-danger">*</span></label>
+        <p class="small text-secondary mb-2">Enter OTP sent to <strong id="unlockShowNum"></strong></p>
+        <input type="text" class="form-control mb-2" id="unlockOtp" placeholder="Enter 4-digit OTP" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" autocomplete="one-time-code" required />
+        <button type="button" class="btn w-100 mt-2" id="verifyOtpBtn" style="background: var(--spanish-green); color: #fff;">Verify OTP</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm w-100 mt-1" id="unlockOtpCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/otp-unlock.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.11.0/dist/tf.min.js"></script>
+  <script src="core/HealthEngine.js"></script>
+  <script src="core/narrativeEngine.js"></script>
+  <script src="assets/js/core/healthScoring.js"></script>
+  <script src="assets/js/core/behaviorClassifier.js"></script>
+  <script src="assets/js/core/riskGradient.js"></script>
+  <script src="assets/js/core/narrativeEngine.js"></script>
+  <script src="assets/js/core/planRecommendation.js"></script>
+  <script src="assets/js/core/index.js"></script>
+  <script src="assets/js/intelligence-engine.js"></script>
+  <script src="assets/js/behavioral-engine.js"></script>
+  <script src="assets/js/ml-engine.js"></script>
+  <script src="assets/js/narrative-engine.js"></script>
+  <script src="assets/js/engine.js"></script>
+  <script src="assets/js/health-intelligence.js"></script>
+  <script src="assets/js/metabolic-simulation.js"></script>
+  <script src="assets/js/biological-visuals.js"></script>
+  <script src="assets/js/ambient-engine.js"></script>
+  <script src="assets/js/webgl/three-core.js"></script>
+  <script src="assets/js/webgl/bio-state.js"></script>
+  <script src="assets/js/webgl/body-scene.js"></script>
+  <script src="assets/js/webgl/risk-radar-3d.js"></script>
+  <script src="assets/js/webgl/hologram-engine.js"></script>
+  <script src="assets/js/biological-avatar.js"></script>
+  <script src="assets/js/ambient-motion.js"></script>
+  <script src="assets/js/components/ScoreEngine.js"></script>
+  <script src="assets/js/components/LiveCard.js"></script>
+  <script src="assets/js/components/SemiArcCard.js"></script>
+  <script src="assets/js/components/AdaptiveCurve.js"></script>
+  <script src="assets/js/components/RecalibrationCore.js"></script>
+  <script src="assets/js/components/AIRadar.js"></script>
+  <script src="assets/js/components/GlassParallax.js"></script>
+  <script src="assets/js/recalibration-core.js"></script>
+  <script src="assets/js/voice-coach.js"></script>
+  <script src="assets/js/gamification-engine.js"></script>
+  <script src="assets/js/risk-radar.js"></script>
+  <script src="assets/js/behavior-engine.js"></script>
+  <script src="assets/js/morph-engine.js"></script>
+  <script src="assets/js/transformation-timeline.js"></script>
+  <script src="assets/js/scroll-intelligence.js"></script>
+  <script src="assets/js/bootstrap.js"></script>
+  <script src="assets/js/journey-report.js"></script>
+  <script src="assets/js/coach-voice.js"></script>
+  <script>
+    (function() {
+      document.addEventListener("DOMContentLoaded", function() {
+        var wraps = document.querySelectorAll(".journey-tooltip-wrap");
+        wraps.forEach(function(w) {
+          var icon = w.querySelector(".journey-tooltip-icon");
+          if (!icon) return;
+          icon.addEventListener("click", function() { w.classList.toggle("tooltip-open"); });
+          icon.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); w.classList.toggle("tooltip-open"); } });
+          document.addEventListener("click", function(e) { if (!w.contains(e.target)) w.classList.remove("tooltip-open"); });
+        });
+        document.querySelectorAll(".glass-card").forEach(function(c) { c.classList.add("journey-hover"); });
+      });
+    })();
+  </script>
+</body>
+</html>
