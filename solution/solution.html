@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Structured Health Plan | Unlimitr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="solution.css" />
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="../core/HealthEngine.js"></script>
+  <script src="../assets/js/engine.js"></script>
+</head>
+<body>
+
+<!-- ============================= -->
+<!-- HERO SECTION -->
+<!-- ============================= -->
+
+<section class="hero-section">
+  <div class="hero-container">
+
+    <div class="hero-text">
+      <h1>Your Structured Correction Plan Is Ready</h1>
+      <p class="hero-subtext">
+        Based on your metabolic intelligence profile, your condition is adaptive —
+        structured correction can restore resilience.
+      </p>
+
+      <div class="hero-cta-group">
+        <button id="activatePlanBtn" class="btn-primary">
+          Activate My Structured Plan
+        </button>
+        <button id="downloadReportBtn" class="btn-secondary">
+          Download Full Medical Report
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-score">
+      <div class="score-circle" id="solutionHealthScore">
+        <svg class="score-svg" viewBox="0 0 200 200">
+          <circle class="score-bg" cx="100" cy="100" r="85" />
+          <circle class="score-fill" cx="100" cy="100" r="85" id="scoreCircle" />
+          <text class="score-text" x="100" y="110" text-anchor="middle" id="scoreValue">0</text>
+        </svg>
+      </div>
+      <div class="score-projection">
+        <span>Projected Improvement</span>
+        <strong id="scoreProjection">32 → 78</strong>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- TRAJECTORY COMPARISON -->
+<!-- ============================= -->
+
+<section class="trajectory-section">
+  <div class="container">
+    <h2>Intervention Impact Simulation</h2>
+
+    <div class="trajectory-container">
+      <div class="chart-block">
+        <canvas id="trajectoryChart"></canvas>
+      </div>
+
+      <div class="trajectory-explanation">
+        <div class="trajectory-item">
+          <h3>Without Structured Intervention</h3>
+          <p>
+            Recovery inefficiency may lead to plateau and hormonal strain escalation.
+          </p>
+        </div>
+
+        <div class="trajectory-item">
+          <h3>With Structured Intervention</h3>
+          <p>
+            Guided metabolic correction improves fat oxidation, insulin sensitivity,
+            and behavioral stability within 12–16 weeks.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- RECOMMENDED PLAN -->
+<!-- ============================= -->
+
+<section class="recommended-plan-section">
+  <div class="container">
+    <h2>Your Recommended Plan</h2>
+
+    <div id="recommendedPlanCard"></div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- VALUE STACK -->
+<!-- ============================= -->
+
+<section class="feature-stack-section">
+  <div class="container">
+    <h2>What You Receive</h2>
+
+    <div class="feature-grid" id="featureGrid"></div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- PRICING BLOCK -->
+<!-- ============================= -->
+
+<section class="pricing-section">
+  <div class="container">
+    <div class="pricing-card">
+
+      <h2>Investment in Structured Correction</h2>
+
+      <div class="daily-price">
+        <span>₹</span>
+        <strong id="dailyCost">99</strong>
+        <span>/day</span>
+      </div>
+
+      <div class="total-price">
+        <span class="strike">₹ 8999</span>
+        <strong id="finalPrice">₹ 6999</strong>
+      </div>
+
+      <button class="btn-primary large" id="checkoutBtn">
+        Proceed to Secure Checkout
+      </button>
+
+      <p class="pricing-note">
+        Less than your daily coffee. Structured intervention prevents long-term metabolic decline.
+      </p>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- PLAN OPTIONS -->
+<!-- ============================= -->
+
+<section class="plan-options-section">
+  <div class="container">
+    <h2>Choose Your Duration</h2>
+
+    <div class="plan-options-container" id="planOptionsContainer"></div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SOCIAL PROOF -->
+<!-- ============================= -->
+
+<section class="proof-section">
+  <div class="container">
+    <h2>Clinical Transformation Outcomes</h2>
+
+    <div id="testimonialBlock"></div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- FINAL CTA -->
+<!-- ============================= -->
+
+<section class="final-cta-section">
+  <div class="container">
+    <h2>Your System Is Recoverable</h2>
+    <p>
+      Adaptive strain detected. Early intervention accelerates reversal.
+    </p>
+
+    <div class="cta-group">
+      <button class="btn-primary large" id="finalCtaBtn">
+        Activate My Structured Plan
+      </button>
+      <button class="btn-secondary" id="finalDownloadBtn">
+        Download Report
+      </button>
+    </div>
+  </div>
+</section>
+
+<script type="module" src="solution.js"></script>
+</body>
+</html>
