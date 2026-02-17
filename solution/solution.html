@@ -3,194 +3,331 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your Structured Health Plan | Unlimitr</title>
+  <title>Your Structured Correction Plan | Unlimitr</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="solution.css" />
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
   <script src="../core/HealthEngine.js"></script>
   <script src="../assets/js/engine.js"></script>
 </head>
 <body>
 
 <!-- ============================= -->
-<!-- HERO SECTION -->
+<!-- SECTION 1 — CLINICAL AUTHORITY HERO -->
 <!-- ============================= -->
 
-<section class="hero-section">
+<section class="clinical-hero">
   <div class="hero-container">
-
-    <div class="hero-text">
-      <h1>Your Structured Correction Plan Is Ready</h1>
+    <div class="hero-content">
+      <h1>Your Structured Correction Plan</h1>
       <p class="hero-subtext">
-        Based on your metabolic intelligence profile, your condition is adaptive —
-        structured correction can restore resilience.
+        Based on your metabolic intelligence profile, your condition is classified as <strong>adaptive strain</strong> — 
+        a reversible physiological state. Structured correction can restore metabolic resilience within 12–16 weeks.
       </p>
-
       <div class="hero-cta-group">
         <button id="activatePlanBtn" class="btn-primary">
-          Activate My Structured Plan
+          Activate Structured Plan
         </button>
         <button id="downloadReportBtn" class="btn-secondary">
-          Download Full Medical Report
+          Download Full Clinical Report
         </button>
       </div>
     </div>
-
     <div class="hero-score">
-      <div class="score-circle" id="solutionHealthScore">
-        <svg class="score-svg" viewBox="0 0 200 200">
-          <circle class="score-bg" cx="100" cy="100" r="85" />
-          <circle class="score-fill" cx="100" cy="100" r="85" id="scoreCircle" />
-          <text class="score-text" x="100" y="110" text-anchor="middle" id="scoreValue">0</text>
+      <div class="score-ring-container">
+        <svg class="score-ring" viewBox="0 0 240 240">
+          <circle class="score-ring-bg" cx="120" cy="120" r="100" />
+          <circle class="score-ring-fill" cx="120" cy="120" r="100" id="scoreRing" />
+          <text class="score-value" x="120" y="130" id="scoreValue">0</text>
+          <text class="score-label" x="120" y="155">Health Score</text>
         </svg>
       </div>
       <div class="score-projection">
-        <span>Projected Improvement</span>
-        <strong id="scoreProjection">32 → 78</strong>
+        <div class="projection-arrow" id="projectionArrow">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M12 4L12 20M12 20L6 14M12 20L18 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="projection-text">
+          <span class="projection-label">Projected Improvement</span>
+          <strong class="projection-value" id="scoreProjection">32 → 78</strong>
+        </div>
       </div>
     </div>
-
   </div>
 </section>
 
 <!-- ============================= -->
-<!-- TRAJECTORY COMPARISON -->
+<!-- SECTION 2 — INTERVENTION IMPACT SIMULATION -->
 <!-- ============================= -->
 
-<section class="trajectory-section">
+<section class="intervention-simulation">
   <div class="container">
     <h2>Intervention Impact Simulation</h2>
-
-    <div class="trajectory-container">
-      <div class="chart-block">
-        <canvas id="trajectoryChart"></canvas>
+    <p class="section-subtext">Metabolic trajectory analysis based on structured correction protocols</p>
+    
+    <div class="simulation-container">
+      <div class="simulation-chart">
+        <svg class="trajectory-svg" id="trajectorySvg" viewBox="0 0 800 400">
+          <defs>
+            <linearGradient id="greenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#2FD4B5;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#0E3D2F;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <!-- Grid lines -->
+          <g class="grid-lines">
+            <line x1="80" y1="50" x2="80" y2="350" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+            <line x1="80" y1="350" x2="720" y2="350" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+          </g>
+          <!-- Without intervention path -->
+          <path class="path-without" id="pathWithout" d="" stroke="#E05656" stroke-width="4" fill="none" stroke-dasharray="8,4"/>
+          <!-- With intervention path -->
+          <path class="path-with" id="pathWith" d="" stroke="url(#greenGradient)" stroke-width="5" fill="none"/>
+          <!-- Tooltip -->
+          <g class="tooltip" id="chartTooltip" opacity="0">
+            <rect x="0" y="0" width="120" height="60" rx="8" fill="rgba(14, 61, 47, 0.95)"/>
+            <text x="60" y="25" fill="white" text-anchor="middle" font-size="12" font-weight="600">Week</text>
+            <text x="60" y="45" fill="#2FD4B5" text-anchor="middle" font-size="14" font-weight="700" id="tooltipValue">0</text>
+          </g>
+        </svg>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-line red"></div>
+            <span>Without Structured Intervention</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-line green"></div>
+            <span>With Structured Intervention</span>
+          </div>
+        </div>
       </div>
-
-      <div class="trajectory-explanation">
-        <div class="trajectory-item">
-          <h3>Without Structured Intervention</h3>
-          <p>
-            Recovery inefficiency may lead to plateau and hormonal strain escalation.
-          </p>
-        </div>
-
-        <div class="trajectory-item">
-          <h3>With Structured Intervention</h3>
-          <p>
-            Guided metabolic correction improves fat oxidation, insulin sensitivity,
-            and behavioral stability within 12–16 weeks.
-          </p>
-        </div>
+      <div class="simulation-insights">
+        <h3>Metabolic Adaptation Outcomes</h3>
+        <ul class="insights-list">
+          <li>
+            <div class="insight-icon">✓</div>
+            <div>
+              <strong>Recovery Efficiency Restored</strong>
+              <p>Sleep fragmentation correction improves cellular repair by 34%</p>
+            </div>
+          </li>
+          <li>
+            <div class="insight-icon">✓</div>
+            <div>
+              <strong>Hormonal Balance Stabilized</strong>
+              <p>Cortisol response normalization reduces abdominal retention</p>
+            </div>
+          </li>
+          <li>
+            <div class="insight-icon">✓</div>
+            <div>
+              <strong>Behavioral Consistency Reinforced</strong>
+              <p>Structured accountability prevents early-phase dropout</p>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ============================= -->
-<!-- RECOMMENDED PLAN -->
+<!-- SECTION 3 — RECOMMENDED PLAN (VALUE STACK) -->
 <!-- ============================= -->
 
-<section class="recommended-plan-section">
+<section class="recommended-plan">
   <div class="container">
     <h2>Your Recommended Plan</h2>
-
     <div id="recommendedPlanCard"></div>
   </div>
 </section>
 
 <!-- ============================= -->
-<!-- VALUE STACK -->
+<!-- SECTION 4 — VALUE STACK VISUALIZATION -->
 <!-- ============================= -->
 
-<section class="feature-stack-section">
+<section class="value-comparison">
   <div class="container">
-    <h2>What You Receive</h2>
-
-    <div class="feature-grid" id="featureGrid"></div>
-  </div>
-</section>
-
-<!-- ============================= -->
-<!-- PRICING BLOCK -->
-<!-- ============================= -->
-
-<section class="pricing-section">
-  <div class="container">
-    <div class="pricing-card">
-
-      <h2>Investment in Structured Correction</h2>
-
-      <div class="daily-price">
-        <span>₹</span>
-        <strong id="dailyCost">99</strong>
-        <span>/day</span>
+    <h2>Market Value Comparison</h2>
+    <div class="comparison-block">
+      <div class="comparison-left">
+        <h3>If You Tried This Separately</h3>
+        <ul class="market-costs">
+          <li>
+            <span class="cost-item">Personal Trainer (12 months)</span>
+            <span class="cost-value" id="trainerCost">₹24,000</span>
+          </li>
+          <li>
+            <span class="cost-item">Clinical Dietitian (24 sessions)</span>
+            <span class="cost-value" id="dietitianCost">₹36,000</span>
+          </li>
+          <li>
+            <span class="cost-item">Behavioral Coaching</span>
+            <span class="cost-value" id="coachingCost">₹18,000</span>
+          </li>
+          <li>
+            <span class="cost-item">Medical Review & Monitoring</span>
+            <span class="cost-value" id="medicalCost">₹12,000</span>
+          </li>
+        </ul>
+        <div class="total-market-cost">
+          <span>Total Market Cost</span>
+          <strong id="totalMarketCost">₹90,000</strong>
+        </div>
       </div>
-
-      <div class="total-price">
-        <span class="strike">₹ 8999</span>
-        <strong id="finalPrice">₹ 6999</strong>
+      <div class="comparison-divider"></div>
+      <div class="comparison-right">
+        <h3>Unlimitr Structured Plan</h3>
+        <div class="unlimitr-price">
+          <span class="price-label">12-Month Comprehensive Correction</span>
+          <strong class="price-value" id="unlimitrPrice">₹19,999</strong>
+          <div class="savings-badge">
+            <span>You Save</span>
+            <strong id="totalSavings">₹70,001</strong>
+          </div>
+        </div>
       </div>
-
-      <button class="btn-primary large" id="checkoutBtn">
-        Proceed to Secure Checkout
-      </button>
-
-      <p class="pricing-note">
-        Less than your daily coffee. Structured intervention prevents long-term metabolic decline.
-      </p>
-
     </div>
   </div>
 </section>
 
 <!-- ============================= -->
-<!-- PLAN OPTIONS -->
+<!-- SECTION 5 — PLAN COMPARISON (UPSELL ENGINE) -->
 <!-- ============================= -->
 
-<section class="plan-options-section">
+<section class="plan-comparison">
   <div class="container">
-    <h2>Choose Your Duration</h2>
-
-    <div class="plan-options-container" id="planOptionsContainer"></div>
+    <h2>Choose Your Correction Duration</h2>
+    <p class="section-subtext">Longer commitment = deeper metabolic reset + greater savings</p>
+    
+    <div class="plan-cards-grid" id="planCardsGrid"></div>
+    
+    <div class="comparison-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>3 Months</th>
+            <th>6 Months</th>
+            <th>12 Months</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dietitian Sessions</td>
+            <td>12</td>
+            <td>24</td>
+            <td><strong>48</strong></td>
+          </tr>
+          <tr>
+            <td>Fitness/Yoga Sessions</td>
+            <td>12</td>
+            <td>24</td>
+            <td><strong>48</strong></td>
+          </tr>
+          <tr>
+            <td>Medical Reviews</td>
+            <td>1</td>
+            <td>2</td>
+            <td><strong>4</strong></td>
+          </tr>
+          <tr>
+            <td>Fat Reset Protocol</td>
+            <td>–</td>
+            <td>✓</td>
+            <td><strong>✓</strong></td>
+          </tr>
+          <tr>
+            <td>Hormonal Reset</td>
+            <td>–</td>
+            <td>–</td>
+            <td><strong>✓</strong></td>
+          </tr>
+          <tr>
+            <td>Clinical Progress Monitoring</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td><strong>✓</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="plan-cta-wrapper">
+      <button class="btn-primary large" id="checkoutBtn">
+        Proceed to Secure Checkout
+      </button>
+    </div>
   </div>
 </section>
 
 <!-- ============================= -->
-<!-- SOCIAL PROOF -->
+<!-- SECTION 6 — CLINICAL OUTCOMES -->
 <!-- ============================= -->
 
-<section class="proof-section">
+<section class="clinical-outcomes">
   <div class="container">
     <h2>Clinical Transformation Outcomes</h2>
-
-    <div id="testimonialBlock"></div>
+    <p class="section-subtext">Measurable improvements from structured correction protocols</p>
+    
+    <div class="outcomes-grid">
+      <div class="outcome-card">
+        <div class="outcome-icon">📊</div>
+        <div class="outcome-value" data-target="10">0</div>
+        <div class="outcome-unit">kg</div>
+        <div class="outcome-label">Average Fat Loss</div>
+        <div class="outcome-range">8–12 kg range</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-icon">⚡</div>
+        <div class="outcome-value" data-target="28">0</div>
+        <div class="outcome-unit">%</div>
+        <div class="outcome-label">Insulin Sensitivity</div>
+        <div class="outcome-range">+28% improvement</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-icon">🔄</div>
+        <div class="outcome-value" data-target="34">0</div>
+        <div class="outcome-unit">%</div>
+        <div class="outcome-label">Recovery Efficiency</div>
+        <div class="outcome-range">+34% enhancement</div>
+      </div>
+      <div class="outcome-card">
+        <div class="outcome-icon">📈</div>
+        <div class="outcome-value" data-target="41">0</div>
+        <div class="outcome-unit">%</div>
+        <div class="outcome-label">Behavioral Stability</div>
+        <div class="outcome-range">+41% consistency</div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- ============================= -->
-<!-- FINAL CTA -->
+<!-- SECTION 7 — FINAL AUTHORITY CTA -->
 <!-- ============================= -->
 
-<section class="final-cta-section">
+<section class="final-cta">
+  <div class="cta-background"></div>
   <div class="container">
     <h2>Your System Is Recoverable</h2>
-    <p>
-      Adaptive strain detected. Early intervention accelerates reversal.
-    </p>
-
-    <div class="cta-group">
+    <p>Adaptive strain detected. Structured intervention accelerates reversal.</p>
+    <div class="cta-buttons">
       <button class="btn-primary large" id="finalCtaBtn">
         Activate My Structured Plan
       </button>
       <button class="btn-secondary" id="finalDownloadBtn">
-        Download Report
+        Download Clinical Report
       </button>
     </div>
   </div>
 </section>
 
-<script type="module" src="solution.js"></script>
+<script src="solution.js"></script>
 </body>
 </html>

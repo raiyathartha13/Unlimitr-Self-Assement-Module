@@ -1,11 +1,15 @@
 /**
- * Solution Page — Dynamic Injection Layer
- * Production-grade solution page with Razorpay integration
- * Loads user recommendation from HealthEngine and renders complete solution experience
+ * UNLIMITR Solution Page — Premium Health-Tech Interactions
+ * Series B-level digital therapeutic platform
  */
 
 (function() {
   'use strict';
+
+  // Register GSAP plugins
+  if (typeof gsap !== 'undefined') {
+    gsap.registerPlugin(ScrollTrigger);
+  }
 
   // =============================
   // DATA LOADING
@@ -28,12 +32,10 @@
   function loadHealthIntelligence() {
     var intelligence = null;
     
-    // Try to get from window (if dashboard was loaded)
     if (typeof window !== "undefined" && window.currentHealthIntelligence) {
       intelligence = window.currentHealthIntelligence;
     }
     
-    // Try to compute from user data
     if (!intelligence) {
       var data = loadUserData();
       if (data && typeof window.HealthEngine !== "undefined") {
@@ -47,7 +49,6 @@
       }
     }
     
-    // Fallback
     if (!intelligence) {
       intelligence = {
         totalScore: 62,
@@ -77,305 +78,376 @@
   function getRecommendedPlan(intelligence) {
     var planRec = intelligence.planRecommendation || {};
     var planType = planRec.type || "total_wellness";
+    var duration = planRec.duration || 3;
     
-    // Plan catalog (matches engine.js)
     var PLAN_CATALOG = {
       total_wellness: {
         title: "Fitstart Total Wellness Plan",
         focus: "Full-body reset with holistic fat-loss support.",
-        bullets: [
-          "Metabolic reset + sustainable fat loss",
-          "Balanced nutrition + stress recovery",
-          "Weekly coach + AI check-ins",
-          "Diet personalization",
-          "AI nudges",
-          "WhatsApp accountability"
-        ]
-      },
-      sugar_shield: {
-        title: "Fitstart Sugar Shield",
-        focus: "Blood sugar control + insulin sensitivity.",
-        bullets: [
-          "Glycemic control nutrition plan",
-          "Low-spike meal timing protocol",
-          "Energy + cravings stabilization"
-        ]
-      },
-      thyro_care: {
-        title: "Fitstart Thyro Care",
-        focus: "Thyroid-supportive nutrition + recovery.",
-        bullets: [
-          "Thyroid-friendly meal planning",
-          "Sleep and stress modulation",
-          "Gentle movement routines"
-        ]
-      },
-      hormo_balance: {
-        title: "Fitstart Hormo Balance",
-        focus: "Hormone balance with cycle-aware coaching.",
-        bullets: [
-          "PCOS/period support protocols",
-          "Inflammation-lowering diet",
-          "Energy + mood stabilization"
+        features: [
+          {
+            title: "24 Personalized Dietitian Sessions",
+            description: "Structured metabolic nutrition correction tailored to biomarkers.",
+            icon: "👨‍⚕️"
+          },
+          {
+            title: "24 Fitness/Yoga Sessions",
+            description: "Movement protocols designed for metabolic efficiency.",
+            icon: "🧘"
+          },
+          {
+            title: "Clinical Progress Monitoring System",
+            description: "Biomarker tracking and adaptive protocol adjustments.",
+            icon: "📊"
+          },
+          {
+            title: "24/7 Clinical Support",
+            description: "Continuous guidance for behavioral consistency.",
+            icon: "💬"
+          }
         ]
       },
       medical_supervised: {
         title: "Medical Supervised Plan",
         focus: "Supervised fat loss with medical-grade safety and monitoring.",
-        bullets: [
-          "Weekly roadmap with medical oversight",
-          "Diet personalization for your conditions",
-          "AI nudges + WhatsApp accountability",
-          "Monthly coach call"
+        features: [
+          {
+            title: "48 Medical Review Sessions",
+            description: "Structured monitoring with condition-specific protocols.",
+            icon: "🏥"
+          },
+          {
+            title: "Clinical Progress Monitoring System",
+            description: "Biomarker tracking and adaptive protocol adjustments.",
+            icon: "📊"
+          },
+          {
+            title: "24/7 Clinical Support",
+            description: "Continuous guidance for behavioral consistency.",
+            icon: "💬"
+          }
         ]
       }
     };
     
     var plan = PLAN_CATALOG[planType] || PLAN_CATALOG.total_wellness;
     
-    // Calculate pricing based on duration
-    var duration = planRec.duration || 3;
-    var basePrice = duration === 3 ? 6999 : duration === 6 ? 12999 : 19999;
-    var originalPrice = basePrice * 1.5;
+    // Calculate pricing
+    var pricing = {
+      3: { price: 6999, original: 10499, daily: 78 },
+      6: { price: 12999, original: 19499, daily: 72 },
+      12: { price: 19999, original: 29999, daily: 55 }
+    };
+    
+    var priceData = pricing[duration] || pricing[3];
     
     return {
       name: plan.title,
       objective: plan.focus,
-      bullets: plan.bullets,
+      features: plan.features,
       duration: duration,
-      durationWeeks: duration * 4,
-      price: basePrice,
-      originalPrice: Math.round(originalPrice),
-      dailyPrice: Math.round(basePrice / (duration * 30)),
-      dietSessions: duration === 3 ? 12 : duration === 6 ? 24 : 36,
-      fitnessSessions: duration === 3 ? 12 : duration === 6 ? 24 : 36,
-      isMedical: planType === "medical_supervised"
+      price: priceData.price,
+      originalPrice: priceData.original,
+      dailyPrice: priceData.daily,
+      dietSessions: duration === 3 ? 12 : duration === 6 ? 24 : 48,
+      fitnessSessions: duration === 3 ? 12 : duration === 6 ? 24 : 48
     };
   }
 
   // =============================
-  // RENDERING FUNCTIONS
+  // SECTION 1 — SCORE RING ANIMATION
   // =============================
 
-  function renderHealthScore(score) {
-    var scoreCircle = document.getElementById("scoreCircle");
+  function animateScoreRing(score) {
+    var scoreRing = document.getElementById("scoreRing");
     var scoreValue = document.getElementById("scoreValue");
     
-    if (scoreCircle && scoreValue) {
-      var circumference = 2 * Math.PI * 85;
-      var offset = circumference - (score / 100) * circumference;
+    if (!scoreRing || !scoreValue) return;
+    
+    var circumference = 2 * Math.PI * 100;
+    var offset = circumference - (score / 100) * circumference;
+    
+    // Animate ring
+    if (typeof gsap !== 'undefined') {
+      gsap.to(scoreRing, {
+        strokeDashoffset: offset,
+        duration: 2,
+        ease: "power2.out"
+      });
       
-      scoreCircle.style.strokeDashoffset = circumference;
-      setTimeout(function() {
-        scoreCircle.style.strokeDashoffset = offset;
-      }, 100);
-      
+      // Animate number count
+      gsap.to({ value: 0 }, {
+        value: score,
+        duration: 2,
+        ease: "power2.out",
+        onUpdate: function() {
+          scoreValue.textContent = Math.round(this.targets()[0].value);
+        }
+      });
+    } else {
+      // Fallback without GSAP
+      scoreRing.style.strokeDashoffset = offset;
       scoreValue.textContent = score;
+    }
+    
+    // Animate projection
+    var projection = document.getElementById("scoreProjection");
+    if (projection) {
+      var targetScore = Math.min(75, score + 30);
+      projection.textContent = score + " → " + targetScore;
     }
   }
 
-  function renderScoreProjection(currentScore, targetScore) {
-    var projectionEl = document.getElementById("scoreProjection");
-    if (projectionEl) {
-      projectionEl.textContent = currentScore + " → " + targetScore;
+  // =============================
+  // SECTION 2 — TRAJECTORY ANIMATION
+  // =============================
+
+  function drawTrajectory(intelligence) {
+    var svg = document.getElementById("trajectorySvg");
+    if (!svg) return;
+    
+    var currentScore = intelligence.totalScore || 62;
+    var weeks = intelligence.correctionWindowWeeks || 12;
+    var width = 640;
+    var height = 300;
+    var padding = 80;
+    var chartWidth = width - (padding * 2);
+    var chartHeight = height - (padding * 2);
+    
+    // Without intervention path (declining)
+    var pathWithout = "";
+    for (var i = 0; i <= weeks; i++) {
+      var x = padding + (i / weeks) * chartWidth;
+      var decline = currentScore - (i * 3); // Decline faster
+      var y = padding + ((100 - decline) / 100) * chartHeight;
+      
+      if (i === 0) {
+        pathWithout += "M " + x + " " + y;
+      } else {
+        pathWithout += " L " + x + " " + y;
+      }
+    }
+    
+    // With intervention path (improving)
+    var pathWith = "";
+    for (var i = 0; i <= weeks; i++) {
+      var x = padding + (i / weeks) * chartWidth;
+      var improvement = currentScore + (i * (75 - currentScore) / weeks);
+      var oscillation = Math.sin(i * 0.4) * 1.5; // Subtle biological fluctuation
+      var y = padding + ((100 - (improvement + oscillation)) / 100) * chartHeight;
+      
+      if (i === 0) {
+        pathWith += "M " + x + " " + y;
+      } else {
+        pathWith += " L " + x + " " + y;
+      }
+    }
+    
+    var pathWithoutEl = document.getElementById("pathWithout");
+    var pathWithEl = document.getElementById("pathWith");
+    
+    if (pathWithoutEl) pathWithoutEl.setAttribute("d", pathWithout);
+    if (pathWithEl) pathWithEl.setAttribute("d", pathWith);
+    
+    // Animate paths
+    if (typeof gsap !== 'undefined') {
+      gsap.fromTo(pathWithoutEl, 
+        { strokeDashoffset: 1000 },
+        { strokeDashoffset: 0, duration: 3, ease: "power2.out" }
+      );
+      
+      gsap.fromTo(pathWithEl,
+        { strokeDashoffset: 1000 },
+        { strokeDashoffset: 0, duration: 3, delay: 0.5, ease: "power2.out" }
+      );
     }
   }
+
+  // =============================
+  // SECTION 3 — RECOMMENDED PLAN
+  // =============================
 
   function renderRecommendedPlan(plan) {
     var container = document.getElementById("recommendedPlanCard");
     if (!container) return;
     
-    container.innerHTML = `
-      <div class="recommended-plan">
+    var html = `
+      <div class="recommended-plan-header">
         <h3>${plan.name}</h3>
         <p>${plan.objective}</p>
-        <ul>
-          <li>${plan.dietSessions} Dietitian Sessions</li>
-          <li>${plan.fitnessSessions} Fitness/Yoga Sessions</li>
-          <li>AI Health App Access</li>
-          <li>24/7 Support</li>
-          ${plan.bullets.map(function(bullet) {
-            return '<li>' + bullet + '</li>';
-          }).join('')}
-        </ul>
       </div>
+      <div class="recommended-plan-features-grid">
     `;
-  }
-
-  function renderFeatureGrid() {
-    var container = document.getElementById("featureGrid");
-    if (!container) return;
     
-    var features = [
-      {
-        title: "Personalized Nutrition",
-        description: "Macro-optimized meal plans aligned with your metabolic profile and health conditions."
-      },
-      {
-        title: "AI-Powered Coaching",
-        description: "Daily nudges, habit tracking, and adaptive recommendations based on your progress."
-      },
-      {
-        title: "Medical Oversight",
-        description: "Structured monitoring with condition-specific protocols for safe, sustainable transformation."
-      },
-      {
-        title: "Behavioral Accountability",
-        description: "WhatsApp support, weekly check-ins, and structured milestones to prevent dropout."
-      },
-      {
-        title: "Recovery Optimization",
-        description: "Sleep, stress, and recovery protocols to enhance metabolic efficiency."
-      },
-      {
-        title: "Long-term Sustainability",
-        description: "Habit-based approach designed for permanent lifestyle transformation."
-      }
-    ];
-    
-    container.innerHTML = features.map(function(feature) {
-      return `
-        <div class="feature-card">
-          <h3>${feature.title}</h3>
+    plan.features.forEach(function(feature, index) {
+      html += `
+        <div class="recommended-plan-feature-card" data-index="${index}">
+          <div class="recommended-plan-feature-image">
+            <div class="recommended-plan-feature-icon">${feature.icon}</div>
+          </div>
+          <h4>${feature.title}</h4>
           <p>${feature.description}</p>
         </div>
       `;
-    }).join('');
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+    
+    // Animate cards on scroll
+    if (typeof gsap !== 'undefined') {
+      gsap.utils.toArray(".recommended-plan-feature-card").forEach(function(card, i) {
+        gsap.fromTo(card,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%"
+            }
+          }
+        );
+      });
+    } else {
+      // Fallback: simple reveal
+      var cards = container.querySelectorAll(".recommended-plan-feature-card");
+      cards.forEach(function(card) {
+        card.classList.add("visible");
+      });
+    }
   }
 
-  function renderTrajectoryChart(intelligence) {
-    var canvas = document.getElementById("trajectoryChart");
-    if (!canvas) return;
+  // =============================
+  // SECTION 4 — VALUE COMPARISON
+  // =============================
+
+  function renderValueComparison(plan) {
+    var duration = plan.duration || 12;
     
-    var ctx = canvas.getContext("2d");
-    var width = canvas.offsetWidth;
-    var height = canvas.offsetHeight;
-    canvas.width = width;
-    canvas.height = height;
+    // Calculate market costs based on duration
+    var marketCosts = {
+      trainer: duration * 2000,
+      dietitian: (duration === 3 ? 12 : duration === 6 ? 24 : 48) * 1500,
+      coaching: duration * 1500,
+      medical: (duration === 3 ? 1 : duration === 6 ? 2 : 4) * 3000
+    };
     
-    var padding = 40;
-    var chartWidth = width - (padding * 2);
-    var chartHeight = height - (padding * 2);
+    var totalMarket = marketCosts.trainer + marketCosts.dietitian + marketCosts.coaching + marketCosts.medical;
+    var savings = totalMarket - plan.price;
     
-    // Clear canvas
-    ctx.clearRect(0, 0, width, height);
-    
-    // Draw axes
-    ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(padding, padding);
-    ctx.lineTo(padding, height - padding);
-    ctx.lineTo(width - padding, height - padding);
-    ctx.stroke();
-    
-    // Draw labels
-    ctx.fillStyle = "#6B7280";
-    ctx.font = "12px Inter";
-    ctx.fillText("Weeks", width / 2 - 30, height - 10);
-    ctx.save();
-    ctx.translate(15, height / 2);
-    ctx.rotate(-Math.PI / 2);
-    ctx.fillText("Health Score", 0, 0);
-    ctx.restore();
-    
-    // Draw without intervention path (red dashed)
-    ctx.strokeStyle = "#D93025";
-    ctx.lineWidth = 3;
-    ctx.setLineDash([5, 5]);
-    ctx.beginPath();
-    var currentScore = intelligence.totalScore;
-    var weeks = intelligence.correctionWindowWeeks || 12;
-    
-    for (var i = 0; i <= weeks; i++) {
-      var x = padding + (i / weeks) * chartWidth;
-      var decline = currentScore - (i * 2); // Decline over time
-      var y = height - padding - (decline / 100) * chartHeight;
+    // Animate numbers
+    function animateValue(id, target, prefix, suffix) {
+      var el = document.getElementById(id);
+      if (!el) return;
       
-      if (i === 0) {
-        ctx.moveTo(x, y);
+      if (typeof gsap !== 'undefined') {
+        gsap.to({ value: 0 }, {
+          value: target,
+          duration: 2,
+          ease: "power2.out",
+          onUpdate: function() {
+            var val = Math.round(this.targets()[0].value);
+            el.textContent = prefix + val.toLocaleString("en-IN") + suffix;
+          }
+        });
       } else {
-        ctx.lineTo(x, y);
+        el.textContent = prefix + target.toLocaleString("en-IN") + suffix;
       }
     }
-    ctx.stroke();
     
-    // Draw with intervention path (green smooth)
-    ctx.strokeStyle = "#0F9D58";
-    ctx.lineWidth = 4;
-    ctx.setLineDash([]);
-    ctx.beginPath();
-    
-    for (var i = 0; i <= weeks; i++) {
-      var x = padding + (i / weeks) * chartWidth;
-      var improvement = currentScore + (i * (75 - currentScore) / weeks);
-      var oscillation = Math.sin(i * 0.5) * 2; // Micro oscillation
-      var y = height - padding - ((improvement + oscillation) / 100) * chartHeight;
-      
-      if (i === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    }
-    ctx.stroke();
-    
-    // Draw markers
-    ctx.fillStyle = "#0F9D58";
-    ctx.beginPath();
-    ctx.arc(padding + chartWidth, padding + (0.25 * chartHeight), 6, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.fillStyle = "#D93025";
-    ctx.beginPath();
-    ctx.arc(padding + chartWidth, padding + (0.75 * chartHeight), 6, 0, Math.PI * 2);
-    ctx.fill();
+    animateValue("trainerCost", marketCosts.trainer, "₹", "");
+    animateValue("dietitianCost", marketCosts.dietitian, "₹", "");
+    animateValue("coachingCost", marketCosts.coaching, "₹", "");
+    animateValue("medicalCost", marketCosts.medical, "₹", "");
+    animateValue("totalMarketCost", totalMarket, "₹", "");
+    animateValue("unlimitrPrice", plan.price, "₹", "");
+    animateValue("totalSavings", savings, "₹", "");
   }
 
-  function renderPricing(plan) {
-    var dailyCostEl = document.getElementById("dailyCost");
-    var finalPriceEl = document.getElementById("finalPrice");
-    
-    if (dailyCostEl) dailyCostEl.textContent = plan.dailyPrice;
-    if (finalPriceEl) {
-      finalPriceEl.textContent = "₹ " + plan.price.toLocaleString("en-IN");
-      var strikeEl = finalPriceEl.previousElementSibling;
-      if (strikeEl && strikeEl.classList.contains("strike")) {
-        strikeEl.textContent = "₹ " + plan.originalPrice.toLocaleString("en-IN");
-      }
-    }
-  }
+  // =============================
+  // SECTION 5 — PLAN COMPARISON
+  // =============================
 
-  function renderPlanOptions(intelligence, currentPlan) {
-    var container = document.getElementById("planOptionsContainer");
+  function renderPlanComparison() {
+    var container = document.getElementById("planCardsGrid");
     if (!container) return;
     
-    var options = [
-      { duration: 3, label: "3 Months", price: 6999, originalPrice: 10499 },
-      { duration: 6, label: "6 Months", price: 12999, originalPrice: 19499, popular: true },
-      { duration: 12, label: "12 Months", price: 19999, originalPrice: 29999 }
+    var plans = [
+      {
+        duration: 3,
+        label: "3 Months",
+        subtitle: "Initial correction phase",
+        price: 6999,
+        original: 10499,
+        daily: 78,
+        savings: 3500,
+        sessions: 12
+      },
+      {
+        duration: 6,
+        label: "6 Months",
+        subtitle: "Stabilization protocol",
+        price: 12999,
+        original: 19499,
+        daily: 72,
+        savings: 6500,
+        sessions: 24
+      },
+      {
+        duration: 12,
+        label: "12 Months",
+        subtitle: "Complete metabolic reset",
+        price: 19999,
+        original: 29999,
+        daily: 55,
+        savings: 10000,
+        sessions: 48,
+        featured: true
+      }
     ];
     
-    container.innerHTML = options.map(function(option) {
-      var isSelected = option.duration === currentPlan.duration;
+    container.innerHTML = plans.map(function(plan) {
+      var savingsPercent = Math.round((plan.savings / plan.original) * 100);
       return `
-        <div class="plan-option-card ${isSelected ? 'selected' : ''}" data-duration="${option.duration}" data-price="${option.price}">
-          ${option.popular ? '<div style="position: absolute; top: -12px; right: 20px; background: var(--primary); color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">POPULAR</div>' : ''}
-          <h3>${option.label}</h3>
-          <div class="duration">${option.duration * 4} weeks of structured correction</div>
-          <div class="price">₹ ${option.price.toLocaleString("en-IN")}</div>
-          <ul class="features">
-            <li>${option.duration * 4} Dietitian Sessions</li>
-            <li>${option.duration * 4} Fitness Sessions</li>
-            <li>AI App Access</li>
-            <li>24/7 Support</li>
-          </ul>
+        <div class="plan-card ${plan.featured ? 'featured' : ''}" data-duration="${plan.duration}" data-price="${plan.price}">
+          ${plan.featured ? '' : '<span class="plan-badge">Save ' + savingsPercent + '%</span>'}
+          <div class="plan-duration">${plan.label}</div>
+          <div class="plan-subtitle">${plan.subtitle}</div>
+          <div class="plan-pricing">
+            <div class="plan-original">₹${plan.original.toLocaleString("en-IN")}</div>
+            <div class="plan-price">₹${plan.price.toLocaleString("en-IN")}</div>
+            <div class="plan-savings">You Save ₹${plan.savings.toLocaleString("en-IN")}</div>
+            <div class="plan-daily">Just <strong>₹${plan.daily}/day</strong></div>
+          </div>
         </div>
       `;
     }).join('');
     
+    // Animate cards
+    if (typeof gsap !== 'undefined') {
+      gsap.utils.toArray(".plan-card").forEach(function(card, i) {
+        gsap.fromTo(card,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            delay: i * 0.1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%"
+            }
+          }
+        );
+      });
+    }
+    
     // Add click handlers
-    var cards = container.querySelectorAll(".plan-option-card");
+    var cards = container.querySelectorAll(".plan-card");
     cards.forEach(function(card) {
       card.addEventListener("click", function() {
         cards.forEach(function(c) { c.classList.remove("selected"); });
@@ -383,99 +455,85 @@
         
         var duration = parseInt(card.dataset.duration);
         var price = parseInt(card.dataset.price);
-        var dailyPrice = Math.round(price / (duration * 30));
-        var originalPrice = Math.round(price * 1.5);
         
-        document.getElementById("dailyCost").textContent = dailyPrice;
-        document.getElementById("finalPrice").textContent = "₹ " + price.toLocaleString("en-IN");
-        var strikeEl = document.getElementById("finalPrice").previousElementSibling;
-        if (strikeEl && strikeEl.classList.contains("strike")) {
-          strikeEl.textContent = "₹ " + originalPrice.toLocaleString("en-IN");
+        // Update global plan
+        if (typeof window !== "undefined") {
+          window.selectedPlan = { duration: duration, price: price };
         }
-        
-        // Update current plan
-        currentPlan.duration = duration;
-        currentPlan.price = price;
-        currentPlan.dailyPrice = dailyPrice;
-        currentPlan.originalPrice = originalPrice;
       });
     });
   }
 
-  function renderTestimonials() {
-    var container = document.getElementById("testimonialBlock");
-    if (!container) return;
+  // =============================
+  // SECTION 6 — CLINICAL OUTCOMES
+  // =============================
+
+  function animateOutcomes() {
+    var outcomeCards = document.querySelectorAll(".outcome-card");
     
-    var testimonials = [
-      {
-        quote: "The structured approach helped me reverse my metabolic strain. Lost 12kg in 3 months with sustainable habits.",
-        author: "Priya S., 34",
-        outcome: "12kg loss • Metabolic score: 45 → 78"
-      },
-      {
-        quote: "Medical oversight gave me confidence. My thyroid levels stabilized while losing weight safely.",
-        author: "Rajesh K., 42",
-        outcome: "8kg loss • TSH normalized • Energy restored"
-      },
-      {
-        quote: "The behavioral accountability prevented my usual dropout. This time I completed the full program.",
-        author: "Anita M., 29",
-        outcome: "15kg loss • Consistency: 95% adherence"
+    outcomeCards.forEach(function(card) {
+      var valueEl = card.querySelector(".outcome-value");
+      if (!valueEl) return;
+      
+      var target = parseInt(valueEl.dataset.target) || 0;
+      
+      if (typeof gsap !== 'undefined') {
+        // Reveal animation
+        gsap.fromTo(card,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 85%"
+            },
+            onComplete: function() {
+              // Count animation
+              gsap.to({ value: 0 }, {
+                value: target,
+                duration: 2,
+                ease: "power2.out",
+                onUpdate: function() {
+                  valueEl.textContent = Math.round(this.targets()[0].value);
+                }
+              });
+            }
+          }
+        );
+      } else {
+        card.classList.add("visible");
+        valueEl.textContent = target;
       }
-    ];
-    
-    container.innerHTML = testimonials.map(function(testimonial) {
-      return `
-        <div class="testimonial-card">
-          <div class="quote">"${testimonial.quote}"</div>
-          <div class="author">— ${testimonial.author}</div>
-          <div class="outcome">${testimonial.outcome}</div>
-        </div>
-      `;
-    }).join('');
+    });
   }
 
   // =============================
   // RAZORPAY INTEGRATION
   // =============================
 
-  function initializeRazorpay(plan) {
+  function initializeRazorpay() {
     var checkoutBtn = document.getElementById("checkoutBtn");
     var finalCtaBtn = document.getElementById("finalCtaBtn");
+    var activateBtn = document.getElementById("activatePlanBtn");
     
     function openCheckout() {
-      // Replace with your actual Razorpay key
-      var RAZORPAY_KEY = "YOUR_RAZORPAY_KEY_ID";
-      
-      if (RAZORPAY_KEY === "YOUR_RAZORPAY_KEY_ID") {
-        alert("Razorpay key not configured. Please set RAZORPAY_KEY in solution.js");
-        return;
-      }
+      var selectedPlan = window.selectedPlan || { duration: 12, price: 19999 };
+      var planName = selectedPlan.duration + "-Month Structured Correction Plan";
       
       var options = {
-        key: RAZORPAY_KEY,
-        amount: plan.price * 100, // Amount in paise
+        key: "YOUR_RAZORPAY_KEY",
+        amount: selectedPlan.price * 100,
         currency: "INR",
         name: "Unlimitr",
-        description: plan.name + " (" + plan.duration + " months)",
-        image: "https://unlimitr.com/img/hca_logo.svg",
+        description: planName,
         handler: function(response) {
-          // Payment success
-          console.log("Payment successful:", response);
           window.location.href = "/payment-success.html?payment_id=" + response.razorpay_payment_id;
         },
-        prefill: {
-          name: "",
-          email: "",
-          contact: ""
-        },
-        notes: {
-          plan_name: plan.name,
-          duration: plan.duration,
-          health_score: window.currentHealthIntelligence ? window.currentHealthIntelligence.totalScore : null
-        },
         theme: {
-          color: "#0f5132"
+          color: "#0E3D2F"
         }
       };
       
@@ -487,17 +545,15 @@
       rzp.open();
     }
     
-    if (checkoutBtn) {
-      checkoutBtn.addEventListener("click", openCheckout);
-    }
-    
-    if (finalCtaBtn) {
-      finalCtaBtn.addEventListener("click", openCheckout);
-    }
+    if (checkoutBtn) checkoutBtn.addEventListener("click", openCheckout);
+    if (finalCtaBtn) finalCtaBtn.addEventListener("click", openCheckout);
+    if (activateBtn) activateBtn.addEventListener("click", function() {
+      document.getElementById("checkoutBtn")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
   }
 
   // =============================
-  // DOWNLOAD REPORT HANDLER
+  // DOWNLOAD HANDLERS
   // =============================
 
   function initializeDownloadHandlers() {
@@ -507,21 +563,19 @@
       btn.addEventListener("click", function() {
         var intelligence = loadHealthIntelligence();
         
-        // Try jsPDF if available
         if (typeof window.jspdf !== "undefined") {
           var doc = new window.jspdf.jsPDF();
           doc.setFont("helvetica");
           doc.setFontSize(20);
-          doc.text("Health Intelligence Report", 20, 24);
+          doc.text("Clinical Health Intelligence Report", 20, 24);
           doc.setFontSize(11);
           doc.text("Total Score: " + intelligence.totalScore + "/100", 20, 36);
           doc.text("Zone: " + intelligence.zone, 20, 46);
           doc.text("Correction Window: " + intelligence.correctionWindowWeeks + " weeks", 20, 56);
           doc.setFontSize(9);
-          doc.text("Generated by Unlimitr AI Health Intelligence", 20, 280);
-          doc.save("Unlimitr_Health_Report.pdf");
+          doc.text("Generated by Unlimitr Clinical Intelligence System", 20, 280);
+          doc.save("Unlimitr_Clinical_Report.pdf");
         } else {
-          // Fallback to print
           window.print();
         }
       });
@@ -537,37 +591,28 @@
     var intelligence = loadHealthIntelligence();
     var plan = getRecommendedPlan(intelligence);
     
-    // Store globally for reference
+    // Store globally
     if (typeof window !== "undefined") {
       window.currentHealthIntelligence = intelligence;
       window.currentPlan = plan;
+      window.selectedPlan = { duration: plan.duration, price: plan.price };
     }
     
-    // Render components
-    renderHealthScore(intelligence.totalScore);
-    renderScoreProjection(intelligence.totalScore, Math.min(75, intelligence.totalScore + 30));
+    // Render sections
+    animateScoreRing(intelligence.totalScore);
+    drawTrajectory(intelligence);
     renderRecommendedPlan(plan);
-    renderFeatureGrid();
-    renderTrajectoryChart(intelligence);
-    renderPricing(plan);
-    renderPlanOptions(intelligence, plan);
-    renderTestimonials();
+    renderValueComparison(plan);
+    renderPlanComparison();
+    animateOutcomes();
     
     // Initialize interactions
-    initializeRazorpay(plan);
+    initializeRazorpay();
     initializeDownloadHandlers();
     
-    // Handle activate plan button
-    var activateBtn = document.getElementById("activatePlanBtn");
-    if (activateBtn) {
-      activateBtn.addEventListener("click", function() {
-        document.getElementById("checkoutBtn").scrollIntoView({ behavior: "smooth", block: "center" });
-      });
-    }
-    
-    // Resize handler for chart
+    // Resize handler
     window.addEventListener("resize", function() {
-      renderTrajectoryChart(intelligence);
+      drawTrajectory(intelligence);
     });
   }
 
