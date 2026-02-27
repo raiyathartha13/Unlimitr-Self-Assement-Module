@@ -550,7 +550,8 @@
     }
 
     setTimeout(function () {
-      window.location.href = "journey.html";
+      // Redirect to ultra dashboard (updated 2024)
+      window.location.href = "journey-ultra.html";
     }, 3000);
   });
 

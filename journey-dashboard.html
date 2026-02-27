@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Genie AI Health Report — Unlimitr</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05070f;
+  --bg2:#080d1c;
+  --card:rgba(10,20,45,0.75);
+  --border:rgba(0,220,180,0.12);
+  --border2:rgba(0,180,255,0.1);
+  --cyan:#00ddb4;
+  --cyan2:#00b8ff;
+  --cyan-dim:rgba(0,221,180,0.15);
+  --cyan-glow:rgba(0,221,180,0.45);
+  --amber:#ffa94d;
+  --red:#ff5959;
+  --green:#00ddb4;
+  --text:#e2f0ff;
+  --muted:rgba(160,200,240,0.5);
+  --muted2:rgba(130,170,220,0.35);
+  --radius:20px;
+}
+html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* ── BG Canvas ── */
+#bgc{position:fixed;inset:0;z-index:0;opacity:0.6;pointer-events:none}
+
+/* ── Layout ── */
+.page{position:relative;z-index:2;max-width:960px;margin:0 auto;padding:24px 16px 80px}
+@media(min-width:640px){.page{padding:32px 24px 100px}}
+@media(min-width:960px){.page{padding:40px 32px 120px}}
+
+/* ── Header ── */
+.site-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;opacity:0;animation:fadeUp .7s ease .2s forwards}
+.logo-pill{display:flex;align-items:center;gap:10px}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:20px;height:20px}
+.brand{font-size:16px;font-weight:700;letter-spacing:-.01em;background:linear-gradient(135deg,var(--cyan),var(--cyan2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.live-badge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;padding:5px 12px;border-radius:999px;background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,221,180,.25);animation:pulseBadge 3s ease-in-out infinite}
+@keyframes pulseBadge{0%,100%{box-shadow:0 0 0 0 rgba(0,221,180,0)}50%{box-shadow:0 0 14px 3px rgba(0,221,180,.25)}}
+
+/* ── Hero greeting ── */
+.hero-greet{text-align:center;margin-bottom:48px;opacity:0;animation:fadeUp .8s ease .4s forwards}
+.hero-sub{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--cyan);margin-bottom:10px}
+.hero-name{font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.15;letter-spacing:-.02em;margin-bottom:8px}
+.hero-tagline{font-size:14px;color:var(--muted);max-width:420px;margin:0 auto;line-height:1.6}
+@media(min-width:640px){.hero-tagline{font-size:15px}}
+
+/* ── Score Hero Strip ── */
+.score-strip{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:28px}
+@media(min-width:560px){.score-strip{grid-template-columns:1fr 1fr;gap:20px}}
+@media(min-width:820px){.score-strip{grid-template-columns:1.3fr 1fr 1fr}}
+
+.score-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 22px;backdrop-filter:blur(20px);box-shadow:0 0 0 1px rgba(0,221,180,.04),0 24px 64px rgba(0,0,0,.4);position:relative;overflow:hidden;opacity:0;transform:translateY(22px) scale(.97);transition:box-shadow .3s}
+.score-card:hover{box-shadow:0 0 0 1px rgba(0,221,180,.12),0 32px 80px rgba(0,0,0,.5),0 0 40px rgba(0,221,180,.06)}
+.score-card::before{content:'';position:absolute;top:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,221,180,.4),transparent)}
+.score-card.main{grid-column:1;background:linear-gradient(155deg,rgba(0,30,55,.85) 0%,rgba(10,20,45,.92) 100%);border-color:rgba(0,221,180,.22)}
+@media(min-width:560px){.score-card.main{grid-column:1/3}}
+@media(min-width:820px){.score-card.main{grid-column:1}}
+
+.card-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:12px}
+
+/* Health Score Gauge */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.gauge-svg{width:min(180px,80%);height:auto;overflow:visible}
+.gauge-track{fill:none;stroke:rgba(0,221,180,.08);stroke-width:16;stroke-linecap:round}
+.gauge-fill{fill:none;stroke-width:16;stroke-linecap:round;stroke-dasharray:502;stroke-dashoffset:502;transition:stroke-dashoffset 2.4s cubic-bezier(.4,0,.2,1)}
+.gauge-score-num{font-family:'Outfit',sans-serif;font-size:38px;font-weight:800;fill:var(--text);text-anchor:middle;dominant-baseline:middle;opacity:0;animation:fadeIn .6s ease 2s forwards}
+.gauge-score-label{font-family:'Outfit',sans-serif;font-size:11px;fill:var(--muted);text-anchor:middle;dominant-baseline:middle;opacity:0;animation:fadeIn .6s ease 2.3s forwards}
+
+/* Age Comparison */
+.age-compare{display:flex;align-items:flex-end;gap:8px;margin-bottom:6px}
+.age-num{font-size:clamp(38px,7vw,52px);font-weight:800;line-height:1;letter-spacing:-.03em}
+.age-num.bio{color:var(--text)}
+.age-num.chrono{font-size:clamp(22px,4vw,32px);color:var(--muted);font-weight:600;margin-bottom:4px}
+.age-vs{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;align-self:center}
+.age-delta{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;margin-top:8px}
+.age-delta.over{background:rgba(255,89,89,.15);color:var(--red)}
+.age-delta.under{background:rgba(0,221,180,.15);color:var(--cyan)}
+.age-label{font-size:10px;color:var(--muted);margin-top:4px}
+
+/* Ticker stat */
+.stat-val{font-size:clamp(30px,5vw,42px);font-weight:800;line-height:1;letter-spacing:-.03em;background:linear-gradient(135deg,var(--cyan),var(--cyan2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-unit{font-size:14px;color:var(--muted);font-weight:500;margin-left:2px;-webkit-text-fill-color:var(--muted)}
+.stat-detail{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.5}
+.stat-pill{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:999px;margin-top:6px}
+.stat-pill.ok{background:rgba(0,221,180,.15);color:var(--cyan)}
+.stat-pill.warn{background:rgba(255,169,77,.15);color:var(--amber)}
+.stat-pill.bad{background:rgba(255,89,89,.15);color:var(--red)}
+
+/* ── Section headers ── */
+.section-head{display:flex;align-items:center;gap:10px;margin-bottom:18px;margin-top:36px}
+.section-head-line{flex:1;height:1px;background:linear-gradient(90deg,rgba(0,221,180,.15),transparent)}
+.section-head-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);white-space:nowrap}
+
+/* ── Radar + Metrics Row ── */
+.two-col{display:grid;grid-template-columns:1fr;gap:24px}
+@media(min-width:640px){.two-col{grid-template-columns:220px 1fr;gap:32px;align-items:start}}
+@media(min-width:820px){.two-col{grid-template-columns:250px 1fr}}
+
+.glass-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;backdrop-filter:blur(20px);box-shadow:0 0 0 1px rgba(0,221,180,.03),0 20px 60px rgba(0,0,0,.35);position:relative;overflow:hidden}
+.glass-panel::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,221,180,.3),transparent)}
+
+/* Radar */
+.radar-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
+#radarSvg{width:100%;height:auto;overflow:visible}
+.radar-ring{fill:none;stroke:rgba(0,221,180,.08);stroke-width:1}
+.radar-spoke{stroke:rgba(0,221,180,.07);stroke-width:1}
+.radar-label{font-family:'Outfit',sans-serif;font-size:9.5px;fill:var(--muted)}
+#radarPoly{fill:rgba(0,221,180,.1);stroke:var(--cyan);stroke-width:1.5;stroke-linejoin:round}
+#rTracer{r:4;fill:var(--cyan2);filter:url(#trGlow);opacity:0}
+.rdot{fill:var(--cyan);opacity:0}
+.rdot.show{animation:dotPop .4s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes dotPop{from{r:0;opacity:0}to{r:3;opacity:1}}
+.r-center-score{font-family:'Outfit',sans-serif;font-size:24px;font-weight:800;fill:var(--text);text-anchor:middle;dominant-baseline:middle;opacity:0;animation:fadeIn .6s ease 2.2s forwards}
+.r-center-sub{font-family:'Outfit',sans-serif;font-size:9px;fill:var(--muted);text-anchor:middle;dominant-baseline:middle;opacity:0;animation:fadeIn .5s ease 2.5s forwards}
+
+/* Metrics list */
+.metrics-list{display:flex;flex-direction:column;gap:14px}
+.metric-row{display:flex;flex-direction:column;gap:5px}
+.metric-header{display:flex;justify-content:space-between;align-items:baseline}
+.metric-name{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.metric-val{font-size:11px;font-weight:700}
+.metric-val.c{color:var(--cyan)}
+.metric-val.w{color:var(--amber)}
+.metric-val.r{color:var(--red)}
+.bar-track{width:100%;height:4px;background:rgba(0,221,180,.07);border-radius:999px}
+.bar-fill{height:100%;border-radius:999px;width:0%;transition:width 1.6s cubic-bezier(.4,0,.2,1);position:relative}
+.bar-fill.c{background:linear-gradient(90deg,#007a6b,var(--cyan))}
+.bar-fill.w{background:linear-gradient(90deg,#9a5a00,var(--amber))}
+.bar-fill.r{background:linear-gradient(90deg,#8a1a1a,var(--red))}
+.bar-fill::after{content:'';position:absolute;right:-2px;top:50%;width:7px;height:7px;border-radius:50%;background:inherit;transform:translateY(-50%);box-shadow:0 0 8px 3px currentColor;opacity:.9}
+
+/* ── Arch Gauge ── */
+.arch-wrap{display:flex;justify-content:center;margin:0 -8px}
+#archSvg{width:100%;max-width:580px;height:auto;overflow:visible}
+.arch-track{fill:none;stroke:rgba(0,221,180,.06);stroke-width:20;stroke-linecap:butt}
+.arch-gauge-bg{fill:none;stroke:rgba(0,221,180,.06);stroke-width:20;stroke-linecap:butt}
+#archFill{fill:none;stroke-width:20;stroke-linecap:butt}
+#archNeedle{stroke:#fff;stroke-width:2.5;stroke-linecap:round;opacity:0;transform-origin:300px 300px}
+#needleDot{fill:#fff;opacity:0;filter:drop-shadow(0 0 8px rgba(255,255,255,.9))}
+.arch-num{font-family:'Outfit',sans-serif;font-size:46px;font-weight:800;fill:var(--text);text-anchor:middle;opacity:0;animation:fadeIn .6s ease 3.2s forwards}
+.arch-sup{font-family:'Outfit',sans-serif;font-size:15px;fill:var(--muted);text-anchor:middle;opacity:0;animation:fadeIn .6s ease 3.4s forwards}
+.arch-sublabel{font-family:'Outfit',sans-serif;font-size:11px;fill:var(--muted);text-anchor:middle;opacity:0;animation:fadeIn .5s ease 3.5s forwards}
+.arch-dsub{font-family:'Outfit',sans-serif;font-size:10px;fill:rgba(130,170,220,.38);text-anchor:middle;opacity:0;animation:fadeIn .5s ease 3.6s forwards}
+.arch-d-pct{font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;fill:var(--cyan2)}
+.arch-d-name{font-family:'Outfit',sans-serif;font-size:9px;fill:var(--muted)}
+.arch-dlabel{opacity:0;transition:opacity .5s ease}
+.arch-dlabel.show{opacity:1}
+.arch-tick-text{font-family:'Outfit',sans-serif;font-size:8px;fill:rgba(130,170,220,.28)}
+.arch-ring{fill:none;stroke:rgba(255,255,255,.03);stroke-width:1}
+.arch-cdot{r:3.5;fill:rgba(0,180,255,.7);filter:drop-shadow(0 0 4px rgba(0,200,255,.9))}
+
+/* ── Footer Stats ── */
+.arch-footer{display:grid;grid-template-columns:1fr;gap:10px;margin-top:18px}
+@media(min-width:480px){.arch-footer{grid-template-columns:repeat(3,1fr)}}
+.arch-stat-cell{background:rgba(0,221,180,.03);border:1px solid rgba(0,221,180,.09);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;transition:background .25s,border-color .25s}
+.arch-stat-cell:hover{background:rgba(0,221,180,.07);border-color:rgba(0,221,180,.2)}
+.ast-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.ast-val{font-size:20px;font-weight:800;line-height:1.1;margin-top:2px}
+.ast-sub{font-size:11px;color:var(--muted);line-height:1.4;margin-top:2px}
+.ast-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-top:6px;display:inline-block;padding:3px 9px;border-radius:999px}
+.ast-badge.ok{background:rgba(0,221,180,.15);color:var(--cyan)}
+.ast-badge.warn{background:rgba(255,169,77,.15);color:var(--amber)}
+.ast-badge.bad{background:rgba(255,89,89,.15);color:var(--red)}
+
+/* ── Metabolic Stats Row ── */
+.meta-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(0,221,180,.08);border:1px solid rgba(0,221,180,.1);border-radius:16px;overflow:hidden;margin-bottom:28px}
+@media(min-width:480px){.meta-strip{grid-template-columns:repeat(4,1fr)}}
+.meta-cell{background:var(--card);padding:14px 16px;display:flex;flex-direction:column;gap:3px;transition:background .25s}
+.meta-cell:hover{background:rgba(0,221,180,.06)}
+.meta-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.meta-num{font-size:clamp(18px,3vw,24px);font-weight:800;line-height:1}
+.meta-sub{font-size:10px;color:var(--muted)}
+.meta-delta{font-size:10px;font-weight:700}
+.meta-delta.up{color:var(--cyan)}
+.meta-delta.dn{color:var(--red)}
+
+/* ── Plan Recommendation ── */
+.plan-card{background:linear-gradient(135deg,rgba(0,40,70,.8) 0%,rgba(5,20,45,.9) 100%);border:1px solid rgba(0,221,180,.25);border-radius:var(--radius);padding:28px;position:relative;overflow:hidden;backdrop-filter:blur(20px);box-shadow:0 0 80px rgba(0,221,180,.05)}
+.plan-card::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,221,180,.5),transparent)}
+.plan-card::after{content:'';position:absolute;bottom:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(0,221,180,.12) 0%,transparent 70%);pointer-events:none}
+.plan-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.plan-title{font-size:clamp(18px,3.5vw,24px);font-weight:800;line-height:1.2;letter-spacing:-.02em}
+.plan-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:6px 14px;border-radius:999px;background:rgba(0,221,180,.15);color:var(--cyan);border:1px solid rgba(0,221,180,.3);white-space:nowrap;flex-shrink:0}
+
+.plan-summary{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:22px}
+
+.plan-features{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:480px){.plan-features{grid-template-columns:1fr 1fr}}
+.plan-feat{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--muted);line-height:1.5}
+.feat-icon{width:20px;height:20px;border-radius:6px;background:rgba(0,221,180,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;margin-top:1px}
+
+.cta-btn{display:inline-flex;align-items:center;gap:8px;margin-top:24px;padding:14px 28px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#04111e;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;letter-spacing:.01em;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;text-decoration:none;box-shadow:0 8px 32px rgba(0,221,180,.3)}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(0,221,180,.45)}
+.cta-btn:active{transform:translateY(0)}
+.discount-tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--cyan);margin-top:10px}
+.discount-tag svg{width:13px;height:13px}
+
+/* ── Health Summary ── */
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;backdrop-filter:blur(20px)}
+.summary-typewriter{font-size:14px;color:var(--muted);line-height:1.8;min-height:80px}
+.cursor{display:inline-block;width:2px;height:14px;background:var(--cyan);margin-left:2px;animation:blink 1s step-end infinite;vertical-align:text-bottom}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── Root Cause Bars ── */
+.rcause-list{display:flex;flex-direction:column;gap:14px}
+.rcause-row{cursor:pointer;border-radius:12px;padding:14px 16px;border:1px solid rgba(0,221,180,.08);background:rgba(0,221,180,.02);transition:background .25s,border-color .25s}
+.rcause-row:hover{background:rgba(0,221,180,.06);border-color:rgba(0,221,180,.18)}
+.rcause-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.rcause-title{font-size:13px;font-weight:600}
+.rcause-score{font-size:12px;font-weight:700;color:var(--cyan)}
+.rcause-bar{height:5px;border-radius:999px;background:rgba(0,221,180,.08);overflow:hidden;margin-bottom:6px}
+.rcause-fill{height:100%;border-radius:999px;width:0%;background:linear-gradient(90deg,#007a6b,var(--cyan));transition:width 1.6s cubic-bezier(.4,0,.2,1)}
+.rcause-detail{font-size:12px;color:var(--muted);line-height:1.5;overflow:hidden;max-height:0;opacity:0;transition:max-height .35s ease,opacity .3s ease}
+.rcause-row.open .rcause-detail{max-height:120px;opacity:1}
+.rcause-chevron{font-size:10px;color:var(--muted);transition:transform .3s}
+.rcause-row.open .rcause-chevron{transform:rotate(180deg)}
+
+/* ── Projection Timeline ── */
+.timeline-wrap{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:16px;align-items:flex-start}
+.tl-dot-col{display:flex;flex-direction:column;align-items:center}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px rgba(0,221,180,.5);flex-shrink:0;margin-top:4px;position:relative;animation:dotPulse 2.5s ease-in-out infinite}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 8px rgba(0,221,180,.5)}50%{box-shadow:0 0 16px 4px rgba(0,221,180,.35)}}
+.tl-line{width:2px;flex:1;min-height:40px;background:linear-gradient(180deg,rgba(0,221,180,.25),rgba(0,221,180,.05));margin:4px 0}
+.tl-content{flex:1;padding-bottom:24px}
+.tl-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--cyan);margin-bottom:4px}
+.tl-text{font-size:13px;color:var(--muted);line-height:1.6}
+.tl-weight{font-size:24px;font-weight:800;color:var(--text);line-height:1;margin-bottom:4px}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes shimmerSlide{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+@keyframes cardIn{to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* Score card animation targets */
+.score-card.ani-1{animation:cardIn 1s cubic-bezier(.22,1,.36,1) .5s forwards}
+.score-card.ani-2{animation:cardIn 1s cubic-bezier(.22,1,.36,1) .65s forwards}
+.score-card.ani-3{animation:cardIn 1s cubic-bezier(.22,1,.36,1) .8s forwards}
+.glass-panel.ani-4{opacity:0;transform:translateY(18px);animation:fadeUp .8s ease 1s forwards}
+
+/* shimmer effect on score main card */
+.shimmer-bar{position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);pointer-events:none;animation:shimmerSlide 3s ease-in-out 2.5s infinite}
+
+/* ── Unlock overlay ── */
+.unlock-overlay{position:fixed;inset:0;z-index:500;background:rgba(5,7,15,.7);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px}
+.unlock-card{background:linear-gradient(155deg,rgba(10,25,55,.95),rgba(5,15,35,.98));border:1px solid rgba(0,221,180,.25);border-radius:24px;padding:36px 28px;max-width:400px;width:100%;text-align:center;box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 80px rgba(0,221,180,.06)}
+.unlock-card h2{font-size:22px;font-weight:800;margin-bottom:8px;line-height:1.2}
+.unlock-card p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px}
+.unlock-input-row{display:flex;gap:8px;margin-bottom:8px}
+.unlock-select{background:rgba(0,221,180,.07);border:1px solid rgba(0,221,180,.2);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;padding:10px 8px;width:70px;outline:none}
+.unlock-input{flex:1;background:rgba(0,221,180,.05);border:1px solid rgba(0,221,180,.15);border-radius:10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;padding:10px 14px;outline:none;transition:border-color .25s}
+.unlock-input:focus{border-color:rgba(0,221,180,.45)}
+.unlock-btn{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#04111e;font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 24px rgba(0,221,180,.3)}
+.unlock-btn:hover{transform:translateY(-1px);box-shadow:0 10px 32px rgba(0,221,180,.45)}
+.unlock-err{font-size:12px;color:var(--red);min-height:16px;margin:4px 0 8px}
+.otp-section{display:none}
+.otp-mode .mobile-section{display:none}
+.otp-mode .otp-section{display:block}
+.skip-link{font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;margin-top:14px;display:inline-block;transition:color .2s}
+.skip-link:hover{color:var(--cyan)}
+
+/* ── Mobile responsive tweaks ── */
+@media(max-width:479px){
+  .score-strip{grid-template-columns:1fr}
+  .score-card.main,.score-card{grid-column:auto}
+}
+</style>
+</head>
+<body>
+
+<!-- Background particle canvas -->
+<canvas id="bgc"></canvas>
+
+<!-- Unlock Overlay -->
+<div class="unlock-overlay" id="unlockOverlay">
+  <div class="unlock-card" id="unlockCard">
+    <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));margin:0 auto 16px;display:flex;align-items:center;justify-content:center">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="#04111e" stroke-width="2.5" stroke-linecap="round" d="M12 2a5 5 0 015 5v3H7V7a5 5 0 015-5z"/><rect x="3" y="10" width="18" height="12" rx="3" fill="#04111e" opacity=".15" stroke="#04111e" stroke-width="2.5"/><circle cx="12" cy="16" r="1.5" fill="#04111e"/></svg>
+    </div>
+    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--cyan);background:rgba(0,221,180,.12);padding:4px 12px;border-radius:999px;display:inline-block;margin-bottom:12px">Exclusive Access</span>
+    <h2>Unlock Your Full Genie AI Report</h2>
+    <p>Verify your mobile number to view your complete health blueprint and get an additional <strong style="color:var(--cyan)">10% off</strong> on your personalized plan.</p>
+    <div class="mobile-section">
+      <div class="unlock-input-row">
+        <select class="unlock-select" id="ccode">
+          <option value="+91">+91</option><option value="+1">+1</option><option value="+44">+44</option><option value="+971">+971</option><option value="+61">+61</option>
+        </select>
+        <input type="tel" class="unlock-input" id="mobileInput" placeholder="10-digit mobile number" maxlength="10"/>
+      </div>
+      <div class="unlock-err" id="mobileErr"></div>
+      <button class="unlock-btn" id="sendOtpBtn">Unlock &amp; Get 10% Off →</button>
+    </div>
+    <div class="otp-section" id="otpSection">
+      <p style="font-size:13px;margin-bottom:12px">OTP sent to <strong id="sentTo" style="color:var(--cyan)"></strong></p>
+      <input type="text" class="unlock-input" id="otpInput" placeholder="Enter 4-digit OTP" maxlength="4" inputmode="numeric" style="width:100%;margin-bottom:12px"/>
+      <div class="unlock-err" id="otpErr"></div>
+      <button class="unlock-btn" id="verifyOtpBtn">Verify OTP →</button>
+      <button id="cancelOtp" style="background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer;margin-top:10px;width:100%">Cancel</button>
+    </div>
+    <div><span class="skip-link" id="skipLink">Skip for now</span></div>
+  </div>
+</div>
+
+<!-- Main Page -->
+<div class="page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="logo-pill">
+      <div class="logo-mark">
+        <svg fill="none" viewBox="0 0 24 24"><path d="M12 2C8.5 2 6 4.5 6 7c0 1.5.5 2.5 1.5 3.5L6 14l2 .5L10 12c.5.2 1.3.3 2 .3s1.5-.1 2-.3l2 2.5L18 14l-1.5-3.5C17.5 9.5 18 8.5 18 7c0-2.5-2.5-5-6-5z" fill="white" opacity=".9"/><circle cx="9.5" cy="7.5" r="1" fill="#04111e"/><circle cx="14.5" cy="7.5" r="1" fill="#04111e"/></svg>
+      </div>
+      <span class="brand">Genie AI · Unlimitr</span>
+    </div>
+    <span class="live-badge">⬤ Live Report</span>
+  </header>
+
+  <!-- Hero Greeting -->
+  <div class="hero-greet">
+    <div class="hero-sub">Your AI Health Assessment</div>
+    <div class="hero-name" id="heroName">Decoding Your Transformation</div>
+    <div class="hero-tagline">Your personalised biological blueprint is ready. Every score below is computed in real-time from your inputs.</div>
+  </div>
+
+  <!-- Score Strip -->
+  <div class="score-strip" id="scoreStrip">
+
+    <!-- Main Health Score Gauge -->
+    <div class="score-card main ani-1" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+      <div class="shimmer-bar"></div>
+      <div class="card-label" style="align-self:flex-start">Overall Health Score</div>
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 200 200">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#00ddb4"/>
+              <stop offset="100%" stop-color="#00b8ff"/>
+            </linearGradient>
+            <filter id="gaugeGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <circle class="gauge-track" cx="100" cy="100" r="80" stroke-dasharray="502" stroke-dashoffset="125" transform="rotate(-225 100 100)"/>
+          <circle class="gauge-fill" id="gaugeFill" cx="100" cy="100" r="80" stroke="url(#gaugeGrad)" transform="rotate(-225 100 100)" filter="url(#gaugeGlow)"/>
+          <text class="gauge-score-num" id="gaugeNum" x="100" y="96">—</text>
+          <text class="gauge-score-label" x="100" y="116">Health Score</text>
+        </svg>
+      </div>
+      <div style="text-align:center">
+        <span class="stat-pill ok" id="scoreTag">Calculating…</span>
+      </div>
+    </div>
+
+    <!-- Biological Age -->
+    <div class="score-card ani-2">
+      <div class="card-label">Biological vs Chronological Age</div>
+      <div class="age-compare">
+        <div>
+          <div class="age-num bio" id="bioAgeNum">—</div>
+          <div class="age-label">Biological Age</div>
+        </div>
+        <div class="age-vs">vs</div>
+        <div>
+          <div class="age-num chrono" id="chronoAgeNum">—</div>
+          <div class="age-label">Actual Age</div>
+        </div>
+      </div>
+      <div class="age-delta" id="ageDelta">Calculating…</div>
+      <p class="stat-detail" id="ageInsight" style="margin-top:10px;font-size:12px"></p>
+    </div>
+
+    <!-- BMI / Metabolic Card -->
+    <div class="score-card ani-3">
+      <div class="card-label">BMI &amp; Metabolic</div>
+      <div class="stat-val" id="bmiNum">—</div>
+      <div class="stat-detail" id="bmiLabel" style="margin-top:6px"></div>
+      <div style="margin-top:12px">
+        <div style="height:4px;border-radius:999px;background:rgba(0,221,180,.08);overflow:hidden">
+          <div id="bmiBar" style="height:100%;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--amber));width:0%;transition:width 2s ease"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--muted)"><span>16</span><span>25</span><span>40+</span></div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="card-label" style="margin-bottom:4px">Est. Daily Calories</div>
+        <div class="stat-val" id="tdeeNum" style="font-size:clamp(22px,4vw,32px)">—</div>
+        <div class="stat-detail" id="tdeeDetail"></div>
+      </div>
+    </div>
+
+  </div><!-- /score-strip -->
+
+  <!-- Metabolic Stats Strip -->
+  <div class="meta-strip ani-4" id="metaStrip">
+    <div class="meta-cell">
+      <span class="meta-label">BMR</span>
+      <span class="meta-num" id="bmrStat">—</span>
+      <span class="meta-sub">kcal / day base</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">Weight to Lose</span>
+      <span class="meta-num" id="wtLoseStat">—</span>
+      <span class="meta-sub" id="wtLoseDetail"></span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">Est. Timeline</span>
+      <span class="meta-num" id="timelineStat">—</span>
+      <span class="meta-sub">weeks</span>
+    </div>
+    <div class="meta-cell">
+      <span class="meta-label">Recovery Score</span>
+      <span class="meta-num" id="recoveryStat">—</span>
+      <span class="meta-sub" id="recoveryDetail"></span>
+    </div>
+  </div>
+
+  <!-- AI Summary -->
+  <div class="section-head" style="opacity:0;animation:fadeUp .7s ease 1.1s forwards">
+    <div class="section-head-label">AI Health Summary</div>
+    <div class="section-head-line"></div>
+  </div>
+  <div class="summary-card" style="opacity:0;animation:fadeUp .8s ease 1.2s forwards;margin-bottom:28px">
+    <div class="summary-typewriter" id="summaryText"><span class="cursor"></span></div>
+  </div>
+
+  <!-- Radar + Metrics -->
+  <div class="section-head" style="opacity:0;animation:fadeUp .7s ease 1.3s forwards">
+    <div class="section-head-label">Risk Distribution &amp; Biomarkers</div>
+    <div class="section-head-line"></div>
+  </div>
+  <div class="two-col" style="margin-bottom:28px">
+    <div class="glass-panel" style="opacity:0;animation:fadeUp .8s ease 1.4s forwards">
+      <div class="radar-wrap">
+        <svg id="radarSvg" viewBox="-15 -15 330 330">
+          <defs>
+            <filter id="trGlow" x="-100%" y="-100%" width="300%" height="300%">
+              <feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="polyGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <g id="rRings"></g><g id="rSpokes"></g><g id="rLabels"></g>
+          <polygon id="radarPoly" points="" filter="url(#polyGlow)"/>
+          <g id="rDots"></g>
+          <circle id="rTracer"/>
+          <text class="r-center-score" id="rCenterScore" x="150" y="144">—</text>
+          <text class="r-center-sub" x="150" y="163">Health Score</text>
+        </svg>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)">Risk Distribution</div>
+      </div>
+    </div>
+    <div class="glass-panel" style="opacity:0;animation:fadeUp .8s ease 1.5s forwards">
+      <div class="card-label" style="margin-bottom:16px">Biomarker Intelligence</div>
+      <div class="metrics-list" id="metricsWrap"></div>
+    </div>
+  </div>
+
+  <!-- Disease Risk Arch Gauge -->
+  <div class="section-head" style="opacity:0;animation:fadeUp .7s ease 1.6s forwards">
+    <div class="section-head-label">Disease Risk Percentile</div>
+    <div class="section-head-line"></div>
+  </div>
+  <div class="glass-panel" style="opacity:0;animation:fadeUp .8s ease 1.7s forwards;margin-bottom:28px">
+    <div class="arch-wrap">
+      <svg id="archSvg" viewBox="0 0 600 330" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="archGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00ddb4"/>
+            <stop offset="42%" stop-color="#00ddb4"/>
+            <stop offset="62%" stop-color="#ffa94d"/>
+            <stop offset="82%" stop-color="#ff7a00"/>
+            <stop offset="100%" stop-color="#ff5959"/>
+          </linearGradient>
+          <filter id="nGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <clipPath id="aClip"><rect x="0" y="0" width="600" height="310"/></clipPath>
+        </defs>
+        <g clip-path="url(#aClip)">
+          <path class="arch-ring" d="M 55,300 A 245,245 0 0 1 545,300"/>
+          <path class="arch-ring" d="M 80,300 A 220,220 0 0 1 520,300"/>
+          <path class="arch-ring" d="M 100,300 A 200,200 0 0 1 500,300"/>
+          <path class="arch-ring" d="M 120,300 A 180,180 0 0 1 480,300"/>
+        </g>
+        <path class="arch-gauge-bg" d="M 120,300 A 180,180 0 0 1 480,300" clip-path="url(#aClip)"/>
+        <path id="archFill" d="M 120,300 A 180,180 0 0 1 480,300" stroke="url(#archGrad)" clip-path="url(#aClip)"/>
+        <line id="archNeedle" x1="300" y1="300" x2="300" y2="128" filter="url(#nGlow)"/>
+        <circle id="needleDot" cx="300" cy="300" r="7" filter="url(#nGlow)"/>
+        <g id="archTicks"></g>
+        <g id="archDots"></g>
+        <g id="archLabels"></g>
+        <text class="arch-num" id="archNum" x="300" y="252">—</text>
+        <text class="arch-sup" x="300" y="274">th</text>
+        <text class="arch-sublabel" x="300" y="291">Percentile</text>
+        <text class="arch-dsub" x="300" y="308" id="archRiskLabel">Your disease risk profile</text>
+      </svg>
+    </div>
+    <div class="arch-footer" id="archFooter">
+      <div class="arch-stat-cell">
+        <span class="ast-label">Highest Risk</span>
+        <span class="ast-val" id="archHighRisk">—</span>
+        <span class="ast-sub" id="archHighSub"></span>
+        <span class="ast-badge bad">↑ Elevated</span>
+      </div>
+      <div class="arch-stat-cell">
+        <span class="ast-label">Overall Percentile</span>
+        <span class="ast-val" id="archPct">—</span>
+        <span class="ast-sub">vs. same age &amp; sex cohort</span>
+        <span class="ast-badge warn" id="archPctBadge">⚠ Calculating</span>
+      </div>
+      <div class="arch-stat-cell">
+        <span class="ast-label">Lowest Risk</span>
+        <span class="ast-val" id="archLowRisk">—</span>
+        <span class="ast-sub" id="archLowSub"></span>
+        <span class="ast-badge ok">✓ Low</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Root Causes -->
+  <div class="section-head" style="opacity:0;animation:fadeUp .7s ease 1.8s forwards">
+    <div class="section-head-label">Root Cause Analysis</div>
+    <div class="section-head-line"></div>
+  </div>
+  <div class="glass-panel" style="opacity:0;animation:fadeUp .8s ease 1.9s forwards;margin-bottom:28px">
+    <div class="rcause-list" id="rcauseList"></div>
+  </div>
+
+  <!-- Transformation Timeline -->
+  <div class="section-head" style="opacity:0;animation:fadeUp .7s ease 2s forwards">
+    <div class="section-head-label">Transformation Timeline</div>
+    <div class="section-head-line"></div>
+  </div>
+  <div class="glass-panel" style="opacity:0;animation:fadeUp .8s ease 2.1s forwards;margin-bottom:36px">
+    <div class="timeline-wrap" id="timelineWrap"></div>
+  </div>
+
+  <!-- Plan Recommendation -->
+  <div class="plan-card" style="opacity:0;animation:fadeUp .9s ease 2.2s forwards" id="planCard">
+    <div class="plan-header">
+      <div>
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--cyan);margin-bottom:6px">Your Recommended Plan</div>
+        <div class="plan-title" id="planTitle">Personalised Transformation Blueprint</div>
+      </div>
+      <span class="plan-badge" id="planBadge">Pro Plan</span>
+    </div>
+    <div class="plan-summary" id="planSummary"></div>
+    <div class="plan-features" id="planFeatures"></div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <a href="#" class="cta-btn">Claim Your Plan <span>→</span></a>
+      <div>
+        <div class="discount-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          10% off unlocked for verified users
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+/* ═══════════════════════════════════════════════════════
+   BACKGROUND — DNA helix particle field (same style as motion demo)
+═══════════════════════════════════════════════════════ */
+(function(){
+  const cv=document.getElementById('bgc'),ctx=cv.getContext('2d');
+  let W,H,particles,t=0;
+  function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+  function mkP(){return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.3,vx:(Math.random()-.5)*.15,vy:(Math.random()-.5)*.1,op:Math.random()*.45+.08,hue:Math.random()>.55?180:150}}
+  function helix(t){
+    for(let ci=0;ci<5;ci++)for(let ri=0;ri<3;ri++){
+      const ox=(ci/5)*W+(W/5)*.2,oy=(ri/3)*H+(H/3)*.25,len=170+ri*35,fr=.022+ci*.003,ph=t*.38+ci*1.15+ri*.65;
+      ctx.save();ctx.translate(ox,oy);ctx.rotate(-.3+ci*.1);
+      ctx.beginPath();for(let s=0;s<len;s+=4){const px=s-len/2,py=Math.sin(px*fr+ph)*25;s?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+      ctx.strokeStyle='rgba(0,221,180,.075)';ctx.lineWidth=1.1;ctx.stroke();
+      ctx.beginPath();for(let s=0;s<len;s+=4){const px=s-len/2,py=Math.sin(px*fr+ph+Math.PI)*25;s?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+      ctx.strokeStyle='rgba(0,180,255,.06)';ctx.lineWidth=1.1;ctx.stroke();
+      for(let s=0;s<len;s+=20){const px=s-len/2,pA=Math.sin(px*fr+ph)*25,pB=Math.sin(px*fr+ph+Math.PI)*25;ctx.beginPath();ctx.moveTo(px,pA);ctx.lineTo(px,pB);ctx.strokeStyle='rgba(0,221,180,.04)';ctx.lineWidth=.7;ctx.stroke()}
+      ctx.restore()
+    }
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);t+=.013;
+    const g=ctx.createRadialGradient(W*.45,H*.38,0,W*.45,H*.38,W*.75);
+    g.addColorStop(0,'rgba(8,15,35,.97)');g.addColorStop(.5,'rgba(5,10,22,.99)');g.addColorStop(1,'rgba(3,6,14,1)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    helix(t);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<-4)p.x=W+4;if(p.x>W+4)p.x=-4;if(p.y<-4)p.y=H+4;if(p.y>H+4)p.y=-4;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.hue===180?`rgba(0,221,180,${p.op})`:`rgba(0,180,255,${p.op})`;ctx.fill()
+    });
+    requestAnimationFrame(tick)
+  }
+  addEventListener('resize',resize);resize();particles=Array.from({length:100},mkP);tick()
+})();
+
+/* ═══════════════════════════════════════════════════════
+   DATA — read from localStorage or use demo data
+═══════════════════════════════════════════════════════ */
+function getAssessmentData(){
+  try{
+    const raw=localStorage.getItem('unlimitr_assessment')||localStorage.getItem('assessmentData')||localStorage.getItem('formData');
+    if(raw){const d=JSON.parse(raw);if(d&&(d.clientName||d.name))return d}
+  }catch(e){}
+  // Demo fallback — realistic data so the page is always beautiful
+  return{
+    clientName:'Alex Johnson',
+    age:34,
+    gender:'male',
+    height:175,
+    weight:88,
+    targetWeight:75,
+    activityLevel:'light',
+    sleepQuality:'poor',
+    stressLevel:'high',
+    dietPreferences:'non-vegetarian',
+    primaryGoal:'weight-loss',
+    commitment:'4-5',
+    healthIssues:[],
+    obstacles:'Work schedule makes it hard to cook'
+  }
+}
+const D=getAssessmentData();
+
+/* ═══════════════════════════════════════════════════════
+   ENGINE — all health computations
+═══════════════════════════════════════════════════════ */
+const age=parseInt(D.age)||30;
+const gender=(D.gender||'male').toLowerCase();
+const height=parseFloat(D.height)||170;
+const weight=parseFloat(D.weight)||75;
+const targetWeight=parseFloat(D.targetWeight)||65;
+const name=D.clientName||D.name||'Friend';
+
+// BMI
+const bmi=+(weight/((height/100)**2)).toFixed(1);
+function bmiCategory(b){
+  if(b<18.5)return{label:'Underweight',cls:'warn'};
+  if(b<25)return{label:'Healthy Weight',cls:'ok'};
+  if(b<30)return{label:'Overweight',cls:'warn'};
+  return{label:'Obese',cls:'bad'}
+}
+const bmiCat=bmiCategory(bmi);
+
+// BMR (Mifflin-St Jeor)
+const bmr=gender==='female'
+  ?10*weight+6.25*height-5*age-161
+  :10*weight+6.25*height-5*age+5;
+
+// TDEE
+const actMult={sedentary:1.2,light:1.375,moderate:1.55,high:1.725};
+const tdee=Math.round(bmr*(actMult[D.activityLevel||'sedentary']||1.3));
+
+// Biological age algorithm
+function calcBioAge(){
+  let adj=0;
+  const a=D.activityLevel||'sedentary';
+  if(a==='sedentary')adj+=4;else if(a==='light')adj+=1.5;else if(a==='moderate')adj-=1;else if(a==='high')adj-=2.5;
+  const s=D.sleepQuality||'poor';
+  if(s==='poor'||s==='very_poor')adj+=3;else if(s==='fair')adj+=1;else if(s==='good')adj-=.5;else adj-=1.5;
+  const st=D.stressLevel||'moderate';
+  if(st==='very_high')adj+=4;else if(st==='high')adj+=2.5;else if(st==='moderate')adj+=.5;else adj-=1;
+  if(bmi>30)adj+=4;else if(bmi>25)adj+=2;else if(bmi<18.5)adj+=1;
+  const hi=D.healthIssues||[];
+  adj+=hi.length*1.5;
+  if(hi.includes('diabetes'))adj+=3;
+  if(hi.includes('bp'))adj+=2;
+  if(hi.includes('cholesterol'))adj+=2;
+  return Math.max(18,Math.round(age+adj))
+}
+const bioAge=calcBioAge();
+const ageDiff=bioAge-age;
+
+// Weight loss timeline (deficit based)
+const deficit=500; // safe ~0.5 kg/week
+const wtDiff=Math.max(0,weight-targetWeight);
+const weeklyLoss=deficit/(tdee>0?7000/14:7); // approx 0.5kg/week
+const timelineWeeks=wtDiff>0?Math.round(wtDiff*2):0;
+
+// Recovery score
+function calcRecovery(){
+  let s=80;
+  const sl=D.sleepQuality||'fair';
+  if(sl==='excellent')s+=10;else if(sl==='good')s+=5;else if(sl==='fair')s-=5;else if(sl==='poor')s-=15;else s-=25;
+  const st=D.stressLevel||'moderate';
+  if(st==='very_high')s-=20;else if(st==='high')s-=10;else if(st==='moderate')s-=3;else s+=5;
+  const a=D.activityLevel||'sedentary';
+  if(a==='high')s+=8;else if(a==='moderate')s+=4;else if(a==='sedentary')s-=8;
+  return Math.max(20,Math.min(100,Math.round(s)))
+}
+const recovery=calcRecovery();
+
+// Overall health score
+function calcHealthScore(){
+  let s=70;
+  if(bmi>=18.5&&bmi<25)s+=10;else if(bmi>=25&&bmi<30)s-=5;else s-=15;
+  s+=(recovery-60)*0.18;
+  const a=D.activityLevel||'sedentary';
+  if(a==='high')s+=8;else if(a==='moderate')s+=4;else if(a==='light')s+=1;else s-=8;
+  const hi=D.healthIssues||[];
+  s-=hi.length*4;
+  s+=(age<30?5:age<45?0:age<60?-5:-12);
+  return Math.max(20,Math.min(99,Math.round(s)))
+}
+const healthScore=calcHealthScore();
+
+// Disease risk percentile
+const riskPct=Math.min(95,Math.max(10,
+  35+Math.round((bmi-22)*1.5+(age-30)*0.4+(ageDiff*2.2)+((D.healthIssues||[]).length*4))
+));
+
+// Radar values [0-1]
+const radarData=[
+  {l:'Metabolic',v:Math.min(.95,Math.max(.15,(1-(bmi-18.5)/25)))},
+  {l:'Sleep',v:D.sleepQuality==='excellent'?.9:D.sleepQuality==='good'?.72:D.sleepQuality==='fair'?.52:D.sleepQuality==='poor'?.3:.2},
+  {l:'Activity',v:D.activityLevel==='high'?.9:D.activityLevel==='moderate'?.72:D.activityLevel==='light'?.5:.25},
+  {l:'Stress',v:D.stressLevel==='low'?.88:D.stressLevel==='moderate'?.65:D.stressLevel==='high'?.4:.2},
+  {l:'Recovery',v:recovery/100},
+  {l:'Vitality',v:Math.max(.15,1-(ageDiff/15))}
+];
+
+// Biomarker metrics
+const metrics=[
+  {name:'Metabolic Health',v:Math.round(radarData[0].v*100),t:radarData[0].v>.6?'c':radarData[0].v>.4?'w':'r',d:Math.round(radarData[0].v*100)+'/ 100'},
+  {name:'Sleep Quality',v:Math.round(radarData[1].v*100),t:radarData[1].v>.6?'c':radarData[1].v>.4?'w':'r',d:radarData[1].v>.7?'Excellent':radarData[1].v>.5?'Good':radarData[1].v>.35?'Fair':'Poor'},
+  {name:'Stress Resilience',v:Math.round(radarData[3].v*100),t:radarData[3].v>.6?'c':radarData[3].v>.4?'w':'r',d:radarData[3].v>.7?'Low Stress':radarData[3].v>.5?'Moderate':'High Stress'},
+  {name:'Recovery Capacity',v:recovery,t:recovery>60?'c':recovery>40?'w':'r',d:recovery+'%'},
+  {name:'Inflammation Index',v:Math.round(radarData[4].v*85),t:radarData[4].v>.6?'c':radarData[4].v>.4?'w':'r',d:radarData[4].v>.65?'Low':'Elevated'}
+];
+
+// Root causes
+function buildRootCauses(){
+  const causes=[];
+  if(bmi>25){const sev=Math.min(100,Math.round((bmi-18.5)/22*100));causes.push({title:'Excess Body Mass',score:sev,t:sev>60?'r':'w',detail:`BMI of ${bmi} indicates excess body fat that elevates your biological age and metabolic load. Reducing to a healthy range can reverse 2–4 biological years.`})}
+  if((D.activityLevel||'sedentary')==='sedentary'||(D.activityLevel||'')===('light')){causes.push({title:'Low Physical Activity',score:72,t:'w',detail:'Sedentary to lightly-active lifestyle limits fat oxidation and reduces cardiovascular efficiency. 150 mins/week of moderate exercise creates significant metabolic shifts within 6 weeks.'})}
+  if(D.sleepQuality==='poor'||D.sleepQuality==='very_poor'){causes.push({title:'Sleep Deprivation',score:80,t:'r',detail:'Poor sleep elevates cortisol, drives fat storage especially around the abdomen, and impairs muscle recovery. Targeting 7–8 hrs of quality sleep is a cornerstone intervention.'})}
+  if(D.stressLevel==='high'||D.stressLevel==='very_high'){causes.push({title:'Chronic Stress',score:68,t:'w',detail:'Elevated cortisol from chronic stress promotes visceral fat accumulation, disrupts insulin signaling, and accelerates cellular aging. Stress-management protocols are included in your plan.'})}
+  if(causes.length===0)causes.push({title:'Nutritional Optimisation',score:45,t:'c',detail:'Your metabolic foundation is relatively strong. Fine-tuning macronutrient timing and micronutrient density will unlock the next level of performance and longevity.'});
+  return causes
+}
+const rootCauses=buildRootCauses();
+
+// Plan recommendation
+function buildPlan(){
+  const goal=D.primaryGoal||'weight-loss';
+  const hi=D.healthIssues||[];
+  const diet=D.dietPreferences||'balanced';
+  let title,badge,summary,features;
+  if(goal==='weight-loss'||goal==='reduce-fat'){
+    title='Advanced Fat Loss & Metabolic Reset';badge='Pro Plan';
+    summary=`Based on your current BMI of ${bmi}, biological age of ${bioAge} (${ageDiff>=0?'+':''}${ageDiff} vs actual), and a target weight of ${targetWeight} kg, your AI-generated plan combines precision calorie management, progressive training intensity, and sleep restoration. Expected fat loss: ${(wtDiff).toFixed(1)} kg over ${timelineWeeks} weeks.`;
+    features=[{i:'🔥',t:'Adaptive Calorie Cycling','d':'Daily targets that adjust weekly'},
+      {i:'💪',t:'Progressive Resistance Plan',d:'3–5 sessions/week, tailored to commitment'},
+      {i:'🧬',t:'Gut & Hormonal Reset',d:'Microbiome-optimised meal planning'},
+      {i:'😴',t:'Sleep Architecture Protocol',d:'Evidence-based sleep optimisation'},
+      {i:'📊',t:'Weekly AI Recalibration',d:'Plan adapts to your data in real-time'},
+      {i:'🥗',t:`${diet.charAt(0).toUpperCase()+diet.slice(1)} Meal Plans`,d:'Culturally relevant, practical recipes'}]
+  } else if(goal==='improve-energy'){
+    title='Energy & Vitality Optimisation Protocol';badge='Elite Plan';
+    summary=`Your recovery score of ${recovery}% and sleep quality signal significant energy recovery potential. Your personalised plan targets mitochondrial health, cortisol regulation, and nutritional density to deliver sustainable, all-day energy.`;
+    features=[{i:'⚡',t:'Mitochondrial Nutrition',d:'CoQ10, B-vitamins, and adaptogens'},
+      {i:'🧘',t:'Cortisol Reset Protocol',d:'Stress & energy balance training'},
+      {i:'🍽️',t:'Energy-Optimised Meal Plans',d:`${diet} options for sustained energy`},
+      {i:'📈',t:'Progress Biomarker Tracking',d:'Weekly score recalibration'},
+      {i:'🌙',t:'Sleep Quality Programme',d:'Circadian rhythm alignment'},
+      {i:'💧',t:'Hydration & Recovery Stack',d:'Electrolytes & recovery protocols'}]
+  } else {
+    title='Total Health Transformation Blueprint';badge='Platinum Plan';
+    summary=`Your comprehensive assessment reveals multiple interconnected health levers. Your plan addresses root causes holistically — integrating nutrition, movement, recovery, and mindset — calibrated to your biological profile.`;
+    features=[{i:'🏆',t:'Holistic Transformation',d:'All pillars addressed simultaneously'},
+      {i:'🩺',t:'Condition-Aware Planning',d:hi.length>0?`Optimised for your specific conditions`:'Preventive health protocols'},
+      {i:'🧬',t:'Biological Age Reversal',d:`Target: reduce bio age by ${Math.min(ageDiff+2,8)} years`},
+      {i:'🍽️',t:'Precision Nutrition',d:'Macros & micros optimised to your metrics'},
+      {i:'🤖',t:'AI Coaching Check-ins',d:'Real-time plan adaptations'},
+      {i:'📊',t:'Monthly Deep Dive Reports',d:'Track your biological transformation'}]
+  }
+  return{title,badge,summary,features}
+}
+const plan=buildPlan();
+
+// Disease risks (personalised)
+const dRisks=[
+  {l:'Hypertension',p:.15+(bmi>30?.12:(bmi>25?.07:0))+((D.healthIssues||[]).includes('bp')?.15:0),s:'above'},
+  {l:'Type 2 Diabetes',p:.35+(bmi>30?.18:(bmi>25?.1:0))+((D.healthIssues||[]).includes('diabetes')?.2:0),s:'above'},
+  {l:'Heart Disease',p:.75+(ageDiff*0.015)+(bmi>30?.08:0),s:'below'},
+  {l:'Metabolic Syndrome',p:.55+(bmi>28?.1:0)+(D.activityLevel==='sedentary'?.08:0),s:'above'},
+  {l:'Cancer',p:.1+(age>50?.06:0),s:'below'}
+];
+
+// AI Summary typewriter text
+function buildSummary(){
+  const sl=D.sleepQuality==='excellent'||D.sleepQuality==='good';
+  const actGood=D.activityLevel==='moderate'||D.activityLevel==='high';
+  const issues=D.healthIssues||[];
+  let txt=`${name}, your Genie AI assessment reveals a biological age of ${bioAge} years`;
+  if(ageDiff>0)txt+=` — ${ageDiff} year${ageDiff!==1?'s':''} older than your chronological age`;
+  else if(ageDiff<0)txt+=` — ${Math.abs(ageDiff)} year${Math.abs(ageDiff)!==1?'s':''} younger than your chronological age. Impressive!`;
+  txt+=`. Your overall health score is ${healthScore}/100`;
+  if(healthScore>=70)txt+=', indicating a strong foundation to build on.';
+  else if(healthScore>=50)txt+=', revealing meaningful opportunities for improvement.';
+  else txt+=', signalling the need for targeted intervention across multiple systems.';
+  if(!sl)txt+=' Sleep quality is currently your most impactful lever — optimising rest can shift your biological age by 2–3 years within 90 days.';
+  if(!actGood)txt+=' Increasing structured activity to 3–4 sessions per week will accelerate fat oxidation and metabolic efficiency significantly.';
+  if(bmi>25)txt+=` With a BMI of ${bmi}, reducing to a healthy range is estimated to take ${timelineWeeks} weeks on your personalised plan.`;
+  if(issues.length>0)txt+=` Your plan is specifically calibrated around your reported conditions (${issues.join(', ')}) to ensure safe and effective progression.`;
+  txt+=' Your recommended plan below addresses these findings with precision, evidence-based protocols.';
+  return txt
+}
+const summaryText=buildSummary();
+
+/* ═══════════════════════════════════════════════════════
+   RENDER
+═══════════════════════════════════════════════════════ */
+// Hero name
+document.getElementById('heroName').textContent=`${name}'s Health Blueprint`;
+
+// Count-up helper
+function countUp(el,target,duration,suffix=''){
+  const start=performance.now();
+  function step(now){
+    const p=Math.min((now-start)/duration,1);
+    const ease=1-Math.pow(1-p,4);
+    el.textContent=Math.round(target*ease)+(suffix||'');
+    if(p<1)requestAnimationFrame(step)
+  }
+  requestAnimationFrame(step)
+}
+
+// Health gauge
+setTimeout(()=>{
+  const arc=502;
+  const ratio=healthScore/100;
+  // 75% of arc = full score (rest is gap) — 502 = full circle, gauge covers 270deg so 502*270/360=376.5
+  const gaugeMax=376;
+  const offset=arc-gaugeMax*ratio;
+  const f=document.getElementById('gaugeFill');
+  if(f){f.style.strokeDashoffset=offset;f.style.transition='stroke-dashoffset 2.4s cubic-bezier(.4,0,.2,1)'}
+  const gn=document.getElementById('gaugeNum');
+  if(gn){gn.textContent='';setTimeout(()=>countUp(gn,healthScore,1800),200)}
+  const tag=document.getElementById('scoreTag');
+  if(tag){
+    tag.textContent=healthScore>=70?'Optimal Foundation':healthScore>=50?'Needs Attention':'Requires Action';
+    tag.className='stat-pill '+(healthScore>=70?'ok':healthScore>=50?'warn':'bad')
+  }
+},600);
+
+// Bio age
+setTimeout(()=>{
+  const ba=document.getElementById('bioAgeNum');
+  const ca=document.getElementById('chronoAgeNum');
+  if(ba)countUp(ba,bioAge,1400);
+  if(ca)countUp(ca,age,1200);
+  const delta=document.getElementById('ageDelta');
+  if(delta){
+    if(ageDiff>0){delta.innerHTML=`↑ ${ageDiff} yrs biologically older`;delta.className='age-delta over'}
+    else if(ageDiff<0){delta.innerHTML=`↓ ${Math.abs(ageDiff)} yrs biologically younger`;delta.className='age-delta under'}
+    else{delta.innerHTML='✓ Aligned with chronological age';delta.className='age-delta under'}
+  }
+  const ai=document.getElementById('ageInsight');
+  if(ai)ai.textContent=ageDiff>3?`Your lifestyle factors are accelerating ageing. The right interventions can reverse ${Math.min(ageDiff,6)} of these years.`:ageDiff>0?`A small gap — highly reversible with targeted nutrition and recovery protocols.`:`You're ageing well. Your plan will help you stay ahead.`
+},800);
+
+// BMI
+setTimeout(()=>{
+  const bn=document.getElementById('bmiNum');
+  const bl=document.getElementById('bmiLabel');
+  const bb=document.getElementById('bmiBar');
+  if(bn)bn.innerHTML=`${bmi}<span class="stat-unit">BMI</span>`;
+  if(bl)bl.textContent=`${bmiCat.label} — target BMI < 25`;
+  if(bb){const pct=Math.min(100,Math.max(5,(bmi/40)*100));setTimeout(()=>bb.style.width=pct+'%',300)}
+  const td=document.getElementById('tdeeNum');
+  const tdd=document.getElementById('tdeeDetail');
+  if(td)countUp(td,tdee,1600);
+  if(tdd)tdd.textContent=`Total daily energy expenditure at ${D.activityLevel||'current'} activity`;
+},700);
+
+// Meta strip
+setTimeout(()=>{
+  const els=[
+    {id:'bmrStat',v:Math.round(bmr),suf:' kcal'},
+    {id:'wtLoseStat',v:+(wtDiff.toFixed(1)),suf:' kg'},
+    {id:'timelineStat',v:timelineWeeks},
+    {id:'recoveryStat',v:recovery,suf:'%'}
+  ];
+  els.forEach(({id,v,suf=''},i)=>setTimeout(()=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=v+(suf||'')
+  },i*120));
+  const wd=document.getElementById('wtLoseDetail');
+  if(wd)wd.textContent=wtDiff>0?`to target ${targetWeight} kg`:'Already at target!';
+  const rd=document.getElementById('recoveryDetail');
+  if(rd)rd.textContent=recovery>=70?'↑ Optimal':recovery>=50?'⚠ Moderate':'↓ Low'
+},900);
+
+// Typewriter
+setTimeout(()=>{
+  const el=document.getElementById('summaryText');
+  if(!el)return;
+  el.innerHTML='<span class="cursor"></span>';
+  let i=0;
+  const txt=summaryText;
+  const cursor=el.querySelector('.cursor');
+  function type(){
+    if(i<txt.length){
+      cursor.before(document.createTextNode(txt[i]));
+      i++;
+      setTimeout(type,i<30?30:18)
+    }
+  }
+  type()
+},1400);
+
+// Metrics
+setTimeout(()=>{
+  const wrap=document.getElementById('metricsWrap');
+  if(!wrap)return;
+  wrap.innerHTML='';
+  const fills=[];
+  metrics.forEach(m=>{
+    const row=document.createElement('div');row.className='metric-row';
+    row.innerHTML=`<div class="metric-header"><span class="metric-name">${m.name}</span><span class="metric-val ${m.t}">${m.d}</span></div><div class="bar-track"><div class="bar-fill ${m.t}" data-v="${m.v}" style="width:0%"></div></div>`;
+    wrap.appendChild(row);fills.push(row.querySelector('.bar-fill'))
+  });
+  setTimeout(()=>fills.forEach((f,i)=>setTimeout(()=>{f.style.width=f.dataset.v+'%'},i*150)),300)
+},1000);
+
+// Radar
+setTimeout(()=>{
+  const NS='http://www.w3.org/2000/svg';
+  const cx=150,cy=150,mr=110;
+  const N=radarData.length;
+  const ang=i=>(i/N)*Math.PI*2-Math.PI/2;
+  const pt=(i,r)=>({x:cx+r*Math.cos(ang(i)),y:cy+r*Math.sin(ang(i))});
+
+  const rG=document.getElementById('rRings');
+  [.25,.5,.75,1].forEach(f=>{
+    const h=document.createElementNS(NS,'polygon');
+    h.setAttribute('points',radarData.map((_,i)=>{const p=pt(i,mr*f);return`${p.x},${p.y}`}).join(' '));
+    h.setAttribute('class','radar-ring');rG.appendChild(h)
+  });
+  const sG=document.getElementById('rSpokes');
+  radarData.forEach((_,i)=>{
+    const o=pt(i,mr),l=document.createElementNS(NS,'line');
+    l.setAttribute('x1',cx);l.setAttribute('y1',cy);l.setAttribute('x2',o.x);l.setAttribute('y2',o.y);
+    l.setAttribute('class','radar-spoke');sG.appendChild(l)
+  });
+  const lG=document.getElementById('rLabels');
+  radarData.forEach((ax,i)=>{
+    const p=pt(i,mr+20),t=document.createElementNS(NS,'text');
+    t.setAttribute('x',p.x);t.setAttribute('y',p.y);
+    t.setAttribute('text-anchor',Math.abs(p.x-cx)<5?'middle':p.x<cx?'end':'start');
+    t.setAttribute('dominant-baseline','middle');
+    t.setAttribute('class','radar-label');t.textContent=ax.l;lG.appendChild(t)
+  });
+  const poly=document.getElementById('radarPoly');
+  const coords=radarData.map((ax,i)=>pt(i,mr*ax.v));
+  poly.setAttribute('points',coords.map(p=>`${p.x},${p.y}`).join(' '));
+  let peri=0;coords.forEach((p,i)=>{const n=coords[(i+1)%N];peri+=Math.hypot(n.x-p.x,n.y-p.y)});
+  poly.style.strokeDasharray=peri;poly.style.strokeDashoffset=peri;
+
+  const dG=document.getElementById('rDots');
+  const dots=coords.map(p=>{
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('class','rdot');c.setAttribute('r','3');
+    dG.appendChild(c);return c
+  });
+  const rcs=document.getElementById('rCenterScore');
+  if(rcs)rcs.textContent=healthScore;
+
+  setTimeout(()=>{
+    poly.style.transition='stroke-dashoffset 2s cubic-bezier(.4,0,.2,1)';
+    poly.style.strokeDashoffset='0';
+    dots.forEach((d,i)=>setTimeout(()=>d.classList.add('show'),i*260));
+    // tracer orbit
+    setTimeout(()=>{
+      const tracer=document.getElementById('rTracer');
+      if(!tracer)return;
+      tracer.setAttribute('cx',coords[0].x);tracer.setAttribute('cy',coords[0].y);
+      tracer.style.opacity='1';
+      if(window.gsap){
+        const tl=gsap.timeline({repeat:-1});
+        coords.forEach((p,i)=>{
+          const n=coords[(i+1)%N],seg=Math.hypot(n.x-p.x,n.y-p.y);
+          tl.to(tracer,{attr:{cx:n.x,cy:n.y},duration:(seg/peri)*2.8,ease:'none'})
+        })
+      }
+    },2200)
+  },400)
+},1100);
+
+// Arch gauge
+setTimeout(()=>{
+  const NS='http://www.w3.org/2000/svg';
+  const CX=300,CY=300,R=180,ARC=Math.PI*R;
+  const ap=(t,r)=>{const a=Math.PI*(1-t);return{x:CX+r*Math.cos(a),y:CY-r*Math.sin(a)}};
+  const pct=riskPct/100;
+
+  // Scale ticks
+  const tG=document.getElementById('archTicks');
+  [0,.25,.5,.75,1].forEach(t=>{
+    const inn=ap(t,R-24),out=ap(t,R+24);
+    const tk=document.createElementNS(NS,'line');
+    tk.setAttribute('x1',inn.x);tk.setAttribute('y1',inn.y);tk.setAttribute('x2',out.x);tk.setAttribute('y2',out.y);
+    tk.setAttribute('stroke','rgba(0,221,180,.15)');tk.setAttribute('stroke-width','1');tG.appendChild(tk);
+    const lp=ap(t,R+38),lb=document.createElementNS(NS,'text');
+    lb.setAttribute('x',lp.x);lb.setAttribute('y',lp.y);lb.setAttribute('text-anchor','middle');lb.setAttribute('dominant-baseline','middle');
+    lb.setAttribute('class','arch-tick-text');lb.textContent=Math.round(t*100);tG.appendChild(lb)
+  });
+
+  // Disease dots
+  const dG=document.getElementById('archDots'),lG=document.getElementById('archLabels');
+  const dNorm=dRisks.map(d=>({...d,p:Math.min(.97,Math.max(.03,d.p))}));
+  dNorm.forEach((d,idx)=>{
+    const onA=ap(d.p,R);
+    const dot=document.createElementNS(NS,'circle');
+    dot.setAttribute('cx',onA.x);dot.setAttribute('cy',onA.y);dot.setAttribute('class','arch-cdot');dot.style.opacity='0';
+    dG.appendChild(dot);
+    const offR=R+(d.s==='above'?62:-62),lp=ap(d.p,offR);
+    const lnP=ap(d.p,R+(d.s==='above'?22:-22));
+    const line=document.createElementNS(NS,'line');
+    line.setAttribute('x1',onA.x);line.setAttribute('y1',onA.y);line.setAttribute('x2',lnP.x);line.setAttribute('y2',lnP.y);
+    line.setAttribute('stroke','rgba(0,221,180,.2)');line.setAttribute('stroke-width','1');line.style.opacity='0';lG.appendChild(line);
+    const anchor=lp.x<CX-18?'end':lp.x>CX+18?'start':'middle';
+    const g=document.createElementNS(NS,'g');g.setAttribute('class','arch-dlabel');
+    const pt=document.createElementNS(NS,'text');
+    pt.setAttribute('x',lp.x);pt.setAttribute('y',lp.y-8);pt.setAttribute('text-anchor',anchor);pt.setAttribute('class','arch-d-pct');pt.textContent=Math.round(d.p*100)+'%';g.appendChild(pt);
+    const nt=document.createElementNS(NS,'text');
+    nt.setAttribute('x',lp.x);nt.setAttribute('y',lp.y+8);nt.setAttribute('text-anchor',anchor);nt.setAttribute('class','arch-d-name');nt.textContent=d.l;g.appendChild(nt);
+    lG.appendChild(g);
+    setTimeout(()=>{
+      dot.style.transition='opacity .4s ease';line.style.transition='opacity .4s ease';
+      dot.style.opacity='1';line.style.opacity='1';g.classList.add('show')
+    },3200+idx*200)
+  });
+
+  // Arc fill
+  const fill=document.getElementById('archFill');
+  fill.style.strokeDasharray=ARC;fill.style.strokeDashoffset=ARC;
+  setTimeout(()=>{
+    fill.style.transition='stroke-dashoffset 2.2s cubic-bezier(.4,0,.2,1)';
+    fill.style.strokeDashoffset=ARC*(1-pct)
+  },1700);
+
+  // Needle
+  const needle=document.getElementById('archNeedle'),ndot=document.getElementById('needleDot');
+  needle.setAttribute('transform','rotate(-90,300,300)');needle.style.opacity='0';ndot.style.opacity='0';
+  setTimeout(()=>{
+    needle.style.transition='opacity .3s ease';ndot.style.transition='opacity .3s ease';
+    needle.style.opacity='1';ndot.style.opacity='1';
+    if(window.gsap){
+      const px={a:-90};
+      gsap.to(px,{a:-90+pct*180,duration:2.4,ease:'power3.out',delay:.1,onUpdate:()=>needle.setAttribute('transform',`rotate(${px.a},300,300)`)})
+    }
+  },1800);
+
+  // Score text
+  const an=document.getElementById('archNum');
+  if(an){setTimeout(()=>countUp(an,riskPct,1600,''),3000)}
+
+  // Footer
+  const sorted=dNorm.slice().sort((a,b)=>b.p-a.p);
+  const hrEl=document.getElementById('archHighRisk');const hrSub=document.getElementById('archHighSub');
+  const lrEl=document.getElementById('archLowRisk');const lrSub=document.getElementById('archLowSub');
+  const pEl=document.getElementById('archPct');const pBadge=document.getElementById('archPctBadge');
+  if(hrEl)hrEl.textContent=sorted[0].l;
+  if(hrSub)hrSub.textContent=Math.round(sorted[0].p*100)+'% lifetime probability';
+  if(lrEl)lrEl.textContent=sorted[sorted.length-1].l;
+  if(lrSub)lrSub.textContent=Math.round(sorted[sorted.length-1].p*100)+'% lifetime probability';
+  if(pEl)pEl.innerHTML=`${riskPct}<span style="font-size:14px;color:var(--muted)">th</span>`;
+  if(pBadge){
+    pBadge.textContent=riskPct<40?'✓ Low Risk':riskPct<65?'⚠ Moderate':'⚠ Suboptimal';
+    pBadge.className='ast-badge '+(riskPct<40?'ok':riskPct<65?'warn':'bad')
+  }
+},1300);
+
+// Root causes
+setTimeout(()=>{
+  const list=document.getElementById('rcauseList');
+  if(!list)return;
+  list.innerHTML='';
+  rootCauses.forEach(rc=>{
+    const el=document.createElement('div');el.className='rcause-row';
+    el.innerHTML=`<div class="rcause-header"><span class="rcause-title">${rc.title}</span><span style="display:flex;align-items:center;gap:8px"><span class="rcause-score">${rc.score}% impact</span><span class="rcause-chevron">▼</span></span></div><div class="rcause-bar"><div class="rcause-fill" data-v="${rc.score}" style="width:0%"></div></div><div class="rcause-detail">${rc.detail}</div>`;
+    list.appendChild(el);
+    el.addEventListener('click',()=>{el.classList.toggle('open')});
+    setTimeout(()=>{const f=el.querySelector('.rcause-fill');if(f)f.style.width=f.dataset.v+'%'},200)
+  })
+},1600);
+
+// Timeline
+setTimeout(()=>{
+  const wrap=document.getElementById('timelineWrap');
+  if(!wrap)return;
+  const w1Kg=+(Math.min(wtDiff,2).toFixed(1));
+  const w4Kg=+(Math.min(wtDiff,4).toFixed(1));
+  const wFinal=+(wtDiff.toFixed(1));
+  const items=[
+    {label:'Week 1–2',weight:weight-w1Kg,text:'Metabolic reset phase. Reducing inflammation, optimising hydration, and activating fat-burning pathways. Average loss: '+(w1Kg*0.5).toFixed(1)+'–'+w1Kg+' kg.'},
+    {label:'Week 3–6',weight:weight-w4Kg,text:'Fat oxidation accelerates. Sleep quality improvements start showing in energy levels. Structured workouts building metabolic capacity.'},
+    {label:'Week 7+',weight:targetWeight,text:'Sustained transformation zone. Biological age reductions begin to consolidate. Body composition improving week-on-week.'},
+    {label:`Week ${timelineWeeks} (Goal)`,weight:targetWeight,text:`Target weight of ${targetWeight} kg achieved. Biological age projected ${Math.max(1,Math.round(ageDiff*.7))} years closer to chronological age.`,final:true}
+  ];
+  items.forEach((item,i)=>{
+    const isLast=i===items.length-1;
+    const el=document.createElement('div');el.className='tl-item';
+    el.innerHTML=`<div class="tl-dot-col"><div class="tl-dot" style="${item.final?'background:var(--cyan2);box-shadow:0 0 12px rgba(0,180,255,.6)':''}"></div>${!isLast?'<div class="tl-line"></div>':''}</div><div class="tl-content"><div class="tl-label">${item.label}</div><div class="tl-weight">${item.weight} kg</div><div class="tl-text">${item.text}</div></div>`;
+    wrap.appendChild(el)
+  })
+},1700);
+
+// Plan card
+setTimeout(()=>{
+  const ptEl=document.getElementById('planTitle');
+  const pbEl=document.getElementById('planBadge');
+  const psEl=document.getElementById('planSummary');
+  const pfEl=document.getElementById('planFeatures');
+  if(ptEl)ptEl.textContent=plan.title;
+  if(pbEl)pbEl.textContent=plan.badge;
+  if(psEl)psEl.textContent=plan.summary;
+  if(pfEl){
+    pfEl.innerHTML='';
+    plan.features.forEach(f=>{
+      const el=document.createElement('div');el.className='plan-feat';
+      el.innerHTML=`<div class="feat-icon">${f.i}</div><div><strong style="color:var(--text);font-size:13px">${f.t}</strong><br>${f.d}</div>`;
+      pfEl.appendChild(el)
+    })
+  }
+},1800);
+
+/* ═══════════════════════════════════════════════════════
+   UNLOCK OVERLAY
+═══════════════════════════════════════════════════════ */
+function hideOverlay(){
+  const o=document.getElementById('unlockOverlay');
+  if(o){o.style.opacity='0';o.style.transition='opacity .5s ease';setTimeout(()=>{o.style.display='none'},500)}
+}
+document.getElementById('sendOtpBtn').addEventListener('click',()=>{
+  const m=document.getElementById('mobileInput').value;
+  const err=document.getElementById('mobileErr');
+  if(!m||m.length<10){err.textContent='Please enter a valid 10-digit mobile number';return}
+  err.textContent='';
+  document.getElementById('sentTo').textContent=document.getElementById('ccode').value+' '+m;
+  document.getElementById('unlockCard').classList.add('otp-mode');
+  // Demo: auto-fill OTP hint
+  setTimeout(()=>{document.getElementById('otpInput').placeholder='Enter OTP (try: 1234)'},300)
+});
+document.getElementById('verifyOtpBtn').addEventListener('click',()=>{
+  const otp=document.getElementById('otpInput').value;
+  const err=document.getElementById('otpErr');
+  if(otp.length<4){err.textContent='Please enter the 4-digit OTP';return}
+  err.textContent='';
+  hideOverlay()
+});
+document.getElementById('cancelOtp').addEventListener('click',()=>{
+  document.getElementById('unlockCard').classList.remove('otp-mode');
+  document.getElementById('mobileErr').textContent='';
+  document.getElementById('otpErr').textContent=''
+});
+document.getElementById('skipLink').addEventListener('click',hideOverlay);
+</script>
+</body>
+</html>

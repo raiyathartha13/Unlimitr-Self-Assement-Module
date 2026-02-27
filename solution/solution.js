@@ -598,22 +598,45 @@
       window.selectedPlan = { duration: plan.duration, price: plan.price };
     }
     
-    // Render sections
-    animateScoreRing(intelligence.totalScore);
-    drawTrajectory(intelligence);
-    renderRecommendedPlan(plan);
-    renderValueComparison(plan);
-    renderPlanComparison();
-    animateOutcomes();
+    // Store plan data in localStorage for offer-upgraded.html
+    try {
+      var planData = {
+        name: plan.name,
+        objective: plan.objective,
+        duration: plan.duration,
+        price: plan.price,
+        originalPrice: plan.originalPrice,
+        dailyPrice: plan.dailyPrice,
+        dietSessions: plan.dietSessions,
+        fitnessSessions: plan.fitnessSessions,
+        features: plan.features,
+        intelligence: {
+          totalScore: intelligence.totalScore,
+          zone: intelligence.zone,
+          correctionWindowWeeks: intelligence.correctionWindowWeeks
+        }
+      };
+      localStorage.setItem('recommendedPlan', JSON.stringify(planData));
+      
+      // Also store health score if available
+      if (intelligence.totalScore) {
+        localStorage.setItem('healthScore', JSON.stringify({
+          total: intelligence.totalScore,
+          metabolic: intelligence.dimensions?.metabolic || 60,
+          recovery: intelligence.dimensions?.recovery || 60,
+          hormonal: intelligence.dimensions?.hormonal || 60,
+          behavioral: intelligence.dimensions?.behavioral || 60
+        }));
+      }
+    } catch (e) {
+      console.warn('Failed to store plan data:', e);
+    }
     
-    // Initialize interactions
-    initializeRazorpay();
-    initializeDownloadHandlers();
-    
-    // Resize handler
-    window.addEventListener("resize", function() {
-      drawTrajectory(intelligence);
-    });
+    // Redirect to offer-upgraded.html after a brief delay to ensure data is stored
+    setTimeout(function() {
+      // Use relative path from solution/ directory
+      window.location.href = '../offer-upgraded.html';
+    }, 100);
   }
 
   // Start when DOM is ready

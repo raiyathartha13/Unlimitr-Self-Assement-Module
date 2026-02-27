@@ -355,7 +355,7 @@ function bindAssessmentPage() {
       return;
     }
     saveAssessment(data);
-    window.location.href = "ai_journey.html";
+    window.location.href = "journey-ultra.html";
   });
 }
 
