@@ -13,24 +13,32 @@
 ═══════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --deep:#0a1628;
-  --deep2:#0d1e38;
-  --cyan:#00d4ff;
-  --cyan-dim:rgba(0,212,255,.15);
-  --cyan-glow:rgba(0,212,255,.5);
-  --cyan-border:rgba(0,212,255,.14);
-  --green:#00b87a;
-  --green-dim:rgba(0,184,122,.14);
-  --amber:#ffb347;
-  --amber-dim:rgba(255,179,71,.14);
-  --red:#ff6b6b;
-  --red-dim:rgba(255,107,107,.14);
-  --text:#e8f0ff;
-  --muted:rgba(180,200,240,.55);
-  --card-bg:rgba(10,20,45,.82);
-  --card-border:rgba(0,212,255,.1);
-  --radius:18px;
-  --shadow:0 24px 64px rgba(0,0,0,.55);
+  /* Brand Colors */
+  --primary-indigo: #0D3256;
+  --spanish-green: #008944;
+  --blue-gray: #0080DD;
+  --earth-yellow: #FFC305;
+  --dark-pastel-red: #FF0A0A;
+  
+  /* Light Theme */
+  --deep: #FFFFFF;
+  --deep2: #F8FAFC;
+  --cyan: var(--blue-gray);
+  --cyan-dim: rgba(0,128,221,.12);
+  --cyan-glow: rgba(0,128,221,.3);
+  --cyan-border: rgba(0,128,221,.2);
+  --green: var(--spanish-green);
+  --green-dim: rgba(0,137,68,.12);
+  --amber: var(--earth-yellow);
+  --amber-dim: rgba(255,195,5,.12);
+  --red: var(--dark-pastel-red);
+  --red-dim: rgba(255,10,10,.12);
+  --text: #0F172A;
+  --muted: rgba(100,116,139,.7);
+  --card-bg: rgba(255,255,255,.95);
+  --card-border: rgba(13,50,86,.12);
+  --radius: 18px;
+  --shadow: 0 8px 30px rgba(15,23,42,.08);
 }
 html{scroll-behavior:smooth;overflow-x:hidden}
 body{
@@ -99,7 +107,7 @@ body{
 }
 .scan-bar-wrap{
   max-width:340px;margin:22px auto 0;
-  height:3px;background:rgba(0,212,255,.1);border-radius:999px;overflow:hidden;
+  height:3px;background:var(--cyan-dim);border-radius:999px;overflow:hidden;
 }
 .scan-bar{
   height:100%;width:0%;border-radius:999px;
@@ -112,7 +120,7 @@ body{
 ═══════════════════════════════════════════════════ */
 .sec-divider{
   height:1px;margin:32px 0;
-  background:linear-gradient(90deg,transparent,rgba(0,212,255,.12) 30%,rgba(0,212,255,.12) 70%,transparent);
+  background:linear-gradient(90deg,transparent,var(--cyan-dim) 30%,var(--cyan-dim) 70%,transparent);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -129,7 +137,7 @@ body{
 .glass::before{
   content:'';
   position:absolute;top:0;left:10%;right:10%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(0,212,255,.22),transparent);
+  background:linear-gradient(90deg,transparent,var(--cyan-border),transparent);
 }
 .card-pad{padding:24px;}
 @media(min-width:600px){.card-pad{padding:28px 32px;}}
@@ -166,7 +174,7 @@ body{
   display:flex;flex-direction:column;align-items:center;gap:8px;
   transition:background .25s;
 }
-.bio-col:hover{background:rgba(0,212,255,.05);}
+.bio-col:hover{background:var(--cyan-dim);}
 .bio-col-label{
   font-size:10px;font-weight:600;letter-spacing:.12em;
   text-transform:uppercase;color:var(--muted);
@@ -190,7 +198,7 @@ body{
   padding:7px 16px;border-radius:999px;
 }
 .bio-delta-badge.warn{background:rgba(255,107,107,.12);color:var(--red);border:1px solid rgba(255,107,107,.2);}
-.bio-delta-badge.ok{background:rgba(0,184,122,.12);color:var(--green);border:1px solid rgba(0,184,122,.2);}
+.bio-delta-badge.ok{background:var(--green-dim);color:var(--green);border:1px solid rgba(0,137,68,.2);}
 
 /* ═══════════════════════════════════════════════════
    SECTION: HEALTH SCORE ARCH GAUGE
@@ -237,7 +245,7 @@ body{
   display:flex;flex-direction:column;gap:3px;
   transition:background .25s;
 }
-.score-foot-cell:hover{background:rgba(0,212,255,.05);}
+.score-foot-cell:hover{background:var(--cyan-dim);}
 .sfc-label{font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
 .sfc-val{font-size:18px;font-weight:700;}
 .sfc-val.cyan{color:var(--cyan);}
@@ -271,8 +279,8 @@ body{
   display:flex;align-items:center;justify-content:center;
   font-size:18px;margin-bottom:10px;
 }
-.mc-icon.cyan{background:rgba(0,212,255,.12);}
-.mc-icon.green{background:rgba(0,184,122,.12);}
+.mc-icon.cyan{background:var(--cyan-dim);}
+.mc-icon.green{background:var(--green-dim);}
 .mc-icon.amber{background:rgba(255,179,71,.12);}
 .mc-icon.red{background:rgba(255,107,107,.12);}
 .mc-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
@@ -283,13 +291,13 @@ body{
 .mc-score.red{color:var(--red);}
 /* Mini arc gauge */
 .mini-arc-wrap{margin-bottom:8px;}
-.mini-arc-track{height:4px;background:rgba(0,212,255,.08);border-radius:999px;overflow:visible;}
+.mini-arc-track{height:4px;background:var(--cyan-dim);border-radius:999px;overflow:visible;}
 .mini-arc-fill{
   height:100%;border-radius:999px;width:0%;
   position:relative;transition:width 1.4s cubic-bezier(.4,0,.2,1) .2s;
 }
-.mini-arc-fill.cyan{background:linear-gradient(90deg,#0090c8,var(--cyan));}
-.mini-arc-fill.green{background:linear-gradient(90deg,#007a52,var(--green));}
+.mini-arc-fill.cyan{background:linear-gradient(90deg,var(--blue-gray),var(--cyan));}
+.mini-arc-fill.green{background:linear-gradient(90deg,var(--spanish-green),var(--green));}
 .mini-arc-fill.amber{background:linear-gradient(90deg,#c07800,var(--amber));}
 .mini-arc-fill.red{background:linear-gradient(90deg,#b03030,var(--red));}
 .mini-arc-fill::after{
@@ -303,7 +311,7 @@ body{
   font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
   padding:3px 9px;border-radius:999px;margin-top:6px;
 }
-.mc-badge.ok{background:rgba(0,184,122,.12);color:var(--green);}
+.mc-badge.ok{background:var(--green-dim);color:var(--green);}
 .mc-badge.warn{background:rgba(255,179,71,.14);color:var(--amber);}
 .mc-badge.bad{background:rgba(255,107,107,.12);color:var(--red);}
 
@@ -331,7 +339,7 @@ body{
   fill:var(--muted);dominant-baseline:middle;
 }
 #radarPoly{
-  fill:rgba(0,184,122,.1);stroke:var(--green);
+  fill:var(--green-dim);stroke:var(--green);
   stroke-width:1.5;stroke-linejoin:round;
   stroke-dasharray:800;stroke-dashoffset:800;
 }
@@ -1052,8 +1060,8 @@ body{
         <span class="cta-badge">✓ Money-back guarantee</span>
       </div>
       <div class="cta-btns">
-        <a href="solution/solution.html" class="btn-primary" id="ctaPrimary">🚀 Unlock My Plan</a>
-        <a href="solution/solution.html" class="btn-outline">View Full Blueprint</a>
+        <a href="solution/offer-upgraded.html" class="btn-primary" id="ctaPrimary">🚀 Unlock My Plan</a>
+        <a href="solution/offer-upgraded.html" class="btn-outline">View Full Blueprint</a>
       </div>
       <p class="cta-trust">Refundable within 7 days · Managed by certified health professionals</p>
     </div>
@@ -1247,9 +1255,24 @@ if (intelligence && intelligence.totalScore !== undefined) {
   // Use HealthEngine data
   healthScore = Math.round(intelligence.totalScore) || 0;
   if (healthScore <= 0) healthScore = 50; // Fallback if invalid
-  bioDelta = parseFloat(intelligence.biologicalStrain) || 0;
-  bioAge = Math.round(parseFloat(D.age) + bioDelta);
-  if (isNaN(bioAge) || bioAge <= 0) bioAge = D.age; // Safety check
+  
+  // Use corrected biological age calculation
+  if (intelligence.biologicalAge !== undefined && intelligence.biologicalAge !== null) {
+    bioAge = Math.round(parseFloat(intelligence.biologicalAge));
+    bioDelta = intelligence.biologicalAgeDelta || (bioAge - parseFloat(D.age));
+  } else {
+    // Fallback: convert biologicalStrain (0-100) to age deviation
+    // Max deviation: +8 years, formula: deviation = (strain / 100) * 8
+    var strain = parseFloat(intelligence.biologicalStrain) || 0;
+    var maxDeviation = 8;
+    bioDelta = (strain / 100) * maxDeviation;
+    bioAge = Math.round(parseFloat(D.age) + bioDelta);
+  }
+  
+  // Safety clamp
+  if (isNaN(bioAge) || bioAge <= 0) bioAge = D.age;
+  if (bioAge > D.age + 8) bioAge = D.age + 8;
+  if (bioAge < D.age - 6) bioAge = D.age - 6;
   
   // Extract dimension scores
   if (intelligence.dimensions) {
@@ -1930,7 +1953,10 @@ function buildCTA(){
   
   if(ctaPlanBadge) ctaPlanBadge.textContent=plan;
   if(ctaHeadingSpan) ctaHeadingSpan.textContent=headingSpan;
-  if(ctaPrimary) ctaPrimary.textContent=btnText;
+  if(ctaPrimary) {
+    ctaPrimary.textContent=btnText;
+    ctaPrimary.href='solution/offer-upgraded.html';
+  }
   
   var projectedScore = Math.min(98, healthScore + Math.round(Math.abs(bioDelta)*1.8));
   var sub='Your Genie AI report has identified a clear, structured path to reduce your biological age by '+Math.round(Math.abs(bioDelta)*0.6)+' years and improve your health score from '+healthScore+' to '+projectedScore+'. Doctor-led, AI-calibrated, personalised to you.';
@@ -1956,11 +1982,11 @@ function buildCTA(){
     } catch(e) {}
   }
   
-  // Update CTA links to solution page
+  // Update CTA links to offer-upgraded page
   var ctaLinks = document.querySelectorAll('#ctaPrimary, .cta-btns .btn-primary, .cta-btns .btn-outline');
   ctaLinks.forEach(function(link){
-    if(link.href && (link.href.indexOf('offer.html') >= 0 || !link.href || link.href === '#')) {
-      link.href = 'solution/solution.html';
+    if(link.href && (link.href.indexOf('offer.html') >= 0 || link.href.indexOf('solution.html') >= 0 || !link.href || link.href === '#')) {
+      link.href = 'solution/offer-upgraded.html';
     }
   });
 }

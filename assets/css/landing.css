@@ -4,19 +4,19 @@
  */
 
 :root {
-  /* Brand Colors */
-  --indigo: #0D3256;
-  --spanish-green: #008944;
-  --teal-green: #008944;
-  --light-gray: #F5F5F5;
-  --white: #FFFFFF;
-  --black: #000000;
-  --text-dark: #333333;
-  --text-gray: #666666;
+  /* Brand Colors - Using Brand Variables */
+  --indigo: var(--primary-indigo, #0D3256);
+  --spanish-green: var(--spanish-green, #008944);
+  --teal-green: var(--spanish-green, #008944);
+  --light-gray: var(--bg-soft, #F8FAFC);
+  --white: var(--bg, #FFFFFF);
+  --black: var(--text-main, #0F172A);
+  --text-dark: var(--text-main, #0F172A);
+  --text-gray: var(--text-secondary, #64748B);
   
   /* Typography */
-  --font-primary: 'Outfit', -apple-system, sans-serif;
-  --font-secondary: 'Lato', -apple-system, sans-serif;
+  --font-primary: var(--font-primary, 'Outfit', -apple-system, sans-serif);
+  --font-secondary: var(--font-body, 'Lato', -apple-system, sans-serif);
 }
 
 * {
@@ -26,9 +26,9 @@
 }
 
 body {
-  font-family: var(--font-secondary);
-  color: var(--text-dark);
-  background: var(--white);
+  font-family: var(--font-body, var(--font-secondary));
+  color: var(--text-main, var(--text-dark));
+  background: var(--bg, var(--white));
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

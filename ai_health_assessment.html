@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Unlimitr Biological Intelligence — Decode Your Transformation</title>
+<meta name="description" content="AI-powered health assessment that calculates your biological age, health score, and builds a personalised transformation plan in 3 minutes."/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+/* ════════════════════════════════════════════════
+   RESET & DESIGN TOKENS
+════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8FAFC;
+  --card:#FFFFFF;
+  --border:rgba(15,23,42,0.08);
+  --accent:#0B2E4F;
+  --accent-muted:rgba(11,46,79,0.8);
+  --cyan:#0B2E4F;
+  --cyan2:#0B2E4F;
+  --cyan-dim:rgba(11,46,79,0.1);
+  --amber:#ffa94d;
+  --red:#ff5959;
+  --gold:#C9A227;
+  --text:#0F172A;
+  --text2:#0F172A;
+  --muted:#64748B;
+  --muted2:rgba(100,116,139,0.6);
+  --radius:20px;
+  --radius-sm:14px;
+}
+html{scroll-behavior:smooth}
+body{width:100%;min-height:100%;background:radial-gradient(circle at 20% 10%,rgba(13,50,86,0.03),transparent 40%),radial-gradient(circle at 80% 90%,rgba(13,50,86,0.03),transparent 40%),#F8FAFC;color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* ── Scanline overlay (removed for light mode) ── */
+body::before{display:none}
+
+/* ── BG Canvas (removed for light mode) ── */
+#bgc{display:none}
+
+/* ── Layout ── */
+.wrap{position:relative;z-index:2;max-width:1100px;margin:0 auto;padding:0 20px}
+@media(min-width:640px){.wrap{padding:0 32px}}
+@media(min-width:1100px){.wrap{padding:0 40px}}
+section{position:relative}
+
+/* ════════════════════════════════════════════════
+   KEYFRAMES
+════════════════════════════════════════════════ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulseCyan{0%,100%{box-shadow:0 0 0 0 rgba(13,50,86,0)}50%{box-shadow:0 0 18px 5px rgba(13,50,86,.28)}}
+@keyframes shimmer{0%{transform:translateX(-120%)}100%{transform:translateX(240%)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.014)}}
+@keyframes orbSpin{to{transform:rotate(360deg)}}
+@keyframes orbFloat{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(4deg)}}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 0 rgba(13,50,86,.6)}50%{box-shadow:0 0 0 8px rgba(13,50,86,0)}}
+@keyframes tickerScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes cardFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes glowPulse{0%,100%{opacity:.4}50%{opacity:.9}}
+@keyframes countUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ════════════════════════════════════════════════
+   STICKY NAV
+════════════════════════════════════════════════ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:14px 0;transition:background .3s,border-bottom .3s,backdrop-filter .3s}
+.nav.scrolled{background:var(--bg);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo-pill{display:flex;align-items:center;gap:9px;text-decoration:none}
+.logo-mark{width:120px;height:34px;border-radius:0;background:transparent;display:flex;align-items:center;justify-content:flex-start;flex-shrink:0;transition:opacity .2s;padding:4px 0}
+.logo-pill:hover .logo-mark{opacity:0.9}
+.brand{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.nav-links{display:none;align-items:center;gap:28px}
+@media(min-width:700px){.nav-links{display:flex}}
+.nav-link{font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-link:hover{color:var(--text)}
+.nav-cta{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:10px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;text-decoration:none;transition:opacity .2s}
+.nav-cta:hover{opacity:0.9}
+
+/* ════════════════════════════════════════════════
+   HERO SECTION
+════════════════════════════════════════════════ */
+.hero{min-height:80vh;display:flex;align-items:center;padding:40px 0 40px;overflow:hidden;position:relative}
+.hero-glow{display:none}
+.hero-inner{display:grid;grid-template-columns:1fr;gap:48px;align-items:center}
+@media(min-width:860px){.hero-inner{grid-template-columns:1fr 1fr;gap:56px}}
+
+/* Left copy */
+.hero-copy{opacity:0;animation:fadeUp .9s ease .2s forwards}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);background:rgba(13,50,86,0.08);border:1px solid var(--border);border-radius:999px;padding:6px 16px;margin-bottom:20px}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:dotPulse 2s ease-in-out infinite;flex-shrink:0}
+.hero-h1{font-size:clamp(34px,5.5vw,62px);font-weight:900;line-height:1.06;letter-spacing:-.035em;margin-bottom:18px}
+.hero-h1 em{font-style:normal;color:var(--accent)}
+.hero-desc{font-size:clamp(14px,2vw,17px);color:var(--muted);line-height:1.72;margin-bottom:28px;max-width:480px}
+.hero-cta-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:28px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:16px 32px;border-radius:16px;background:linear-gradient(135deg,var(--spanish-green),var(--blue-gray));color:#FFFFFF;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;text-decoration:none;border:none;cursor:pointer;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s cubic-bezier(.2,.8,.2,1);letter-spacing:.01em;box-shadow:0 8px 32px rgba(13,50,86,0.25),0 2px 8px rgba(0,0,0,0.1);min-height:48px}
+.btn-primary:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(13,50,86,0.35),0 6px 20px rgba(0,0,0,0.15);color:#FFFFFF}
+.btn-ghost{display:inline-flex;align-items:center;gap:6px;padding:14px 28px;border-radius:16px;border:1.5px solid rgba(13,50,86,.2);color:var(--text);font-family:'Outfit',sans-serif;font-size:15px;font-weight:600;text-decoration:none;transition:border-color .3s cubic-bezier(.2,.8,.2,1),background .3s cubic-bezier(.2,.8,.2,1),transform .3s cubic-bezier(.2,.8,.2,1);min-height:48px}
+.btn-ghost:hover{border-color:var(--primary-indigo);background:rgba(13,50,86,0.08);transform:translateY(-2px);color:var(--primary-indigo)}
+.hero-trust{display:flex;align-items:baseline;gap:10px;flex-wrap:nowrap;justify-content:center;align-content:stretch;flex-direction:row}
+.trust-chip{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted2);font-weight:500}
+.trust-chip svg{width:12px;height:12px;stroke:var(--cyan);fill:none;flex-shrink:0}
+
+/* Right — dashboard preview mockup */
+.hero-visual{opacity:0;animation:fadeUp 1s ease .5s forwards;position:relative;display:flex;align-items:center;justify-content:center}
+.mockup-card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:24px;box-shadow:0 2px 8px rgba(15,23,42,0.04);position:relative;overflow:hidden}
+.mockup-card::before{display:none}
+.mockup-shimmer{display:none}
+.mock-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.mock-title{font-size:13px;font-weight:700;color:var(--text)}
+.mock-live{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);background:var(--accent-muted);border:1px solid var(--border);border-radius:999px;padding:3px 9px}
+/* Score gauge preview */
+.mock-gauge-row{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+.mock-gauge{position:relative;width:80px;height:80px;flex-shrink:0}
+.mock-gauge svg{width:80px;height:80px}
+.mock-gauge-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.mock-score{font-size:22px;font-weight:900;color:var(--accent)}
+.mock-score-sub{font-size:8px;color:var(--muted);margin-top:-2px;font-weight:500}
+.mock-stats{flex:1;display:flex;flex-direction:column;gap:8px}
+.mock-stat-row{display:flex;justify-content:space-between;align-items:center;font-size:11px}
+.mock-stat-label{color:var(--muted);font-weight:500}
+.mock-stat-val{font-weight:700;color:var(--text)}
+.mock-stat-val.cyan{color:var(--accent)}
+.mock-stat-val.red{color:var(--red)}
+/* Metric bars */
+.mock-bars{display:flex;flex-direction:column;gap:9px;margin-bottom:16px}
+.mock-bar-row{display:flex;flex-direction:column;gap:4px}
+.mock-bar-header{display:flex;justify-content:space-between;font-size:10px}
+.mock-bar-name{color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.mock-bar-val{font-weight:700;color:var(--accent)}
+.mock-bar-track{height:3px;border-radius:999px;background:var(--border)}
+.mock-bar-fill{height:100%;border-radius:999px;background:var(--accent)}
+/* Mini CTA */
+.mock-cta{width:100%;padding:11px;border-radius:10px;background:var(--accent);color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:800;text-align:center;border:none;cursor:default;letter-spacing:.01em}
+/* floating decorators */
+@keyframes floatUpDown{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.float-badge{position:absolute;display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:12px;border:1px solid;font-size:11px;font-weight:700;white-space:nowrap;z-index:10;animation:floatUpDown 3s ease-in-out infinite}
+.float-badge.bio{top:-18px;right:-12px;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px) saturate(140%);-webkit-backdrop-filter:blur(10px) saturate(140%);border-color:rgba(255,255,255,0.8);color:var(--accent);box-shadow:0 8px 24px rgba(15,23,42,0.12),inset 0 1px 0 rgba(255,255,255,0.6);animation-delay:0s}
+.float-badge.score{bottom:-10px;left:-20px;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px) saturate(140%);-webkit-backdrop-filter:blur(10px) saturate(140%);border-color:rgba(255,255,255,0.8);color:var(--accent);box-shadow:0 8px 24px rgba(15,23,42,0.12),inset 0 1px 0 rgba(255,255,255,0.6);animation-delay:1.5s}
+@media(max-width:859px){.float-badge{display:none}}
+
+/* ════════════════════════════════════════════════
+   TICKER / MARQUEE
+════════════════════════════════════════════════ */
+.ticker-wrap{overflow:hidden;border-top:1px solid rgba(13,50,86,.08);border-bottom:1px solid rgba(13,50,86,.08);padding:12px 0;margin:0 0}
+.ticker-track{display:flex;width:max-content;animation:tickerScroll 28s linear infinite}
+.ticker-item{display:flex;align-items:center;gap:8px;padding:0 32px;font-size:12px;font-weight:600;color:var(--muted);white-space:nowrap;text-transform:uppercase;letter-spacing:.08em}
+.ticker-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* ════════════════════════════════════════════════
+   HOW IT WORKS — 3-step flow
+════════════════════════════════════════════════ */
+.how-section{padding:40px 0}
+.section-eyebrow{display:flex;align-items:center;justify-content:center;gap:8px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);margin-bottom:14px}
+.section-eyebrow span{display:inline-block;width:24px;height:1px;background:var(--border)}
+.section-title{font-size:clamp(28px,4.5vw,46px);font-weight:900;line-height:1.1;letter-spacing:-.03em;text-align:center;margin-bottom:14px;color:var(--text);opacity:1}
+.section-title em{font-style:normal;color:var(--accent)}
+.section-sub{font-size:clamp(13px,2vw,16px);color:var(--muted);text-align:center;max-width:500px;margin:0 auto 60px;line-height:1.7}
+
+.steps-flow{display:grid;grid-template-columns:1fr;gap:20px;position:relative}
+@media(min-width:640px){.steps-flow{grid-template-columns:repeat(3,1fr);gap:16px}}
+
+/* connector line on desktop */
+@media(min-width:640px){
+  .steps-flow::before{content:'';position:absolute;top:48px;left:calc(16.66% + 16px);right:calc(16.66% + 16px);height:1px;background:linear-gradient(90deg,var(--border),var(--border));z-index:0}
+}
+
+.step-card{background:rgba(255,255,255,0.75);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border:1px solid rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.9);border-left:1px solid rgba(255,255,255,0.9);box-shadow:0 8px 30px rgba(15,23,42,0.06),inset 0 1px 0 rgba(255,255,255,0.6);border-radius:20px;padding:32px 24px;position:relative;overflow:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1),background .4s ease;z-index:1}
+.step-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(15,23,42,0.10),inset 0 1px 0 rgba(255,255,255,0.8)}
+.step-num{font-size:32px;font-weight:800;color:var(--accent);margin-bottom:12px;opacity:0;transform:translateY(12px);transition:opacity 0.5s ease,transform 0.5s ease}
+.step-divider{width:0;height:1px;background:var(--border);margin-bottom:20px;transition:width 0.5s ease}
+.step-name{font-size:18px;font-weight:700;margin-bottom:12px;letter-spacing:-.01em;opacity:0;transform:translateY(12px);transition:opacity 0.5s ease 0.15s,transform 0.5s ease 0.15s}
+.step-desc{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:8px;opacity:0;transform:translateY(12px);transition:opacity 0.5s ease 0.3s,transform 0.5s ease 0.3s}
+.step-list{list-style:none;padding:0;margin:12px 0;opacity:0;transform:translateY(12px);transition:opacity 0.5s ease 0.3s,transform 0.5s ease 0.3s}
+.step-list li{font-size:14px;color:var(--text);line-height:1.8;padding-left:20px;position:relative;margin-bottom:6px}
+.step-list li::before{content:'•';position:absolute;left:0;color:var(--accent);font-weight:700}
+.step-note{font-size:13px;color:var(--muted);font-style:italic;margin-top:12px;opacity:0;transform:translateY(12px);transition:opacity 0.5s ease 0.45s,transform 0.5s ease 0.45s}
+.step-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:6px 12px;border-radius:999px;margin-top:16px;opacity:0;transform:translateY(12px);transition:opacity 0.5s ease 0.6s,transform 0.5s ease 0.6s}
+.step-badge.s1{background:var(--accent-muted);color:var(--accent);border:1px solid var(--border)}
+.step-badge.s2{background:var(--accent-muted);color:var(--accent);border:1px solid var(--border)}
+.step-badge.s3{background:var(--accent-muted);color:var(--accent);border:1px solid var(--border)}
+.step-card.animate .step-num{opacity:1;transform:translateY(0)}
+.step-card.animate .step-divider{width:60px}
+.step-card.animate .step-name{opacity:1;transform:translateY(0)}
+.step-card.animate .step-desc{opacity:1;transform:translateY(0)}
+.step-card.animate .step-list{opacity:1;transform:translateY(0)}
+.step-card.animate .step-note{opacity:1;transform:translateY(0)}
+.step-card.animate .step-badge{opacity:1;transform:translateY(0)}
+
+/* ════════════════════════════════════════════════
+   PERSONALISED TO YOU — premium feature cards
+════════════════════════════════════════════════ */
+.personalized-section{padding:40px 0 40px}
+.personalized-grid{display:grid;grid-template-columns:1fr;gap:20px;margin-top:48px}
+@media(min-width:640px){.personalized-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:960px){.personalized-grid{grid-template-columns:repeat(3,1fr)}}
+
+.personalized-card{background:rgba(255,255,255,0.75);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border:1px solid rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.9);border-left:1px solid rgba(255,255,255,0.9);box-shadow:0 8px 30px rgba(15,23,42,0.06),inset 0 1px 0 rgba(255,255,255,0.6);border-radius:20px;padding:32px;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1),background .4s ease;opacity:1;transform:translateY(0)}
+.personalized-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(15,23,42,0.10),inset 0 1px 0 rgba(255,255,255,0.8)}
+.personalized-icon{width:24px;height:24px;color:var(--accent);margin-bottom:20px;transition:color 0.3s ease}
+.personalized-card:hover .personalized-icon{color:#0A2848}
+.personalized-title{font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.3;letter-spacing:-.01em}
+.personalized-desc{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* ════════════════════════════════════════════════
+   WHAT YOU GET — feature showcase
+════════════════════════════════════════════════ */
+.features-section{padding:40px 0 40px;background:#FFFFFF}
+.section-divider{width:0;height:1px;background:var(--border);margin:40px auto 48px;max-width:200px;opacity:0;transform:scaleX(0);transition:opacity 0.6s ease,transform 0.6s ease}
+.section-divider.revealed{opacity:1;transform:scaleX(1);width:100%}
+
+.features-grid{display:grid;grid-template-columns:1fr;gap:20px;margin-top:0}
+@media(min-width:640px){.features-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:960px){.features-grid{grid-template-columns:repeat(3,1fr)}}
+
+.feat-card{background:rgba(255,255,255,0.75);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border:1px solid rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.9);border-left:1px solid rgba(255,255,255,0.9);box-shadow:0 8px 30px rgba(15,23,42,0.06),inset 0 1px 0 rgba(255,255,255,0.6);border-radius:20px;padding:32px;position:relative;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1),background .4s ease}
+.feat-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(15,23,42,0.10),inset 0 1px 0 rgba(255,255,255,0.8)}
+.feat-icon{width:24px;height:24px;margin-bottom:20px;display:flex;align-items:flex-start;transition:opacity 0.3s ease}
+.feat-card:hover .feat-icon{opacity:0.8}
+.feat-icon svg{width:24px;height:24px;stroke:#0F172A;stroke-width:1.5}
+.feat-title{font-size:16px;font-weight:700;color:var(--text);margin-bottom:12px;line-height:1.3;letter-spacing:-.01em}
+.feat-desc{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* ════════════════════════════════════════════════
+   SOCIAL PROOF — numbers strip
+════════════════════════════════════════════════ */
+.proof-section{padding:40px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:0;background:var(--bg)}
+.proof-numbers{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border)}
+@media(min-width:640px){.proof-numbers{grid-template-columns:repeat(4,1fr)}}
+.proof-num-cell{background:var(--bg);padding:28px 20px;text-align:center;display:flex;flex-direction:column;gap:5px;align-items:center}
+.proof-big{font-size:clamp(32px,5vw,52px);font-weight:900;line-height:1;color:var(--accent);letter-spacing:-.03em}
+.proof-label{font-size:12px;color:var(--muted);font-weight:500;line-height:1.4;text-align:center}
+
+/* ════════════════════════════════════════════════
+   TESTIMONIALS
+════════════════════════════════════════════════ */
+.testimonials-section{padding:40px 0;background:#FFFFFF}
+.testimonials-grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:560px){.testimonials-grid{grid-template-columns:1fr 1fr}}
+@media(min-width:860px){.testimonials-grid{grid-template-columns:repeat(3,1fr)}}
+
+.testi-card{background:rgba(255,255,255,0.75);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border:1px solid rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.9);border-left:1px solid rgba(255,255,255,0.9);box-shadow:0 8px 30px rgba(15,23,42,0.06),inset 0 1px 0 rgba(255,255,255,0.6);border-radius:20px;padding:22px;position:relative;overflow:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1),background .4s ease}
+.testi-card:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(15,23,42,0.10),inset 0 1px 0 rgba(255,255,255,0.8)}
+.testi-card::before{display:none}
+.testi-stars{color:var(--gold);font-size:14px;letter-spacing:2px;margin-bottom:10px}
+.testi-quote{font-size:13.5px;color:var(--text2);line-height:1.7;margin-bottom:14px;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:10px}
+.testi-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.testi-name{font-size:13px;font-weight:700;color:var(--text)}
+.testi-meta{font-size:11px;color:var(--accent);font-weight:500;margin-top:2px}
+.testi-result{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;padding:3px 9px;border-radius:999px;margin-top:10px}
+.testi-result.win{background:var(--accent-muted);color:var(--accent)}
+
+/* ════════════════════════════════════════════════
+   COMPARISON TABLE
+════════════════════════════════════════════════ */
+.compare-section{padding:80px 0 96px}
+.compare-wrap{background:rgba(255,255,255,0.75);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border:1px solid rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.9);border-left:1px solid rgba(255,255,255,0.9);box-shadow:0 8px 30px rgba(15,23,42,0.06),inset 0 1px 0 rgba(255,255,255,0.6);border-radius:20px;overflow:hidden;transition:transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1),background .4s ease}
+.compare-wrap:hover{transform:translateY(-8px);box-shadow:0 20px 60px rgba(15,23,42,0.10),inset 0 1px 0 rgba(255,255,255,0.8)}
+.compare-header{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid rgba(13,50,86,.1)}
+.compare-col-head{padding:20px 16px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;text-align:center}
+.compare-col-head.hl{background:var(--accent-muted);color:var(--accent);border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.compare-col-head.dim{color:var(--muted)}
+.compare-row{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)}
+.compare-row:last-child{border-bottom:none}
+.compare-cell{padding:14px 16px;font-size:13px;text-align:center;display:flex;align-items:center;justify-content:center}
+.compare-cell.feature{font-size:12.5px;color:var(--muted);font-weight:500;text-align:left;justify-content:flex-start}
+.compare-cell.hl{background:var(--accent-muted);border-left:1px solid var(--border);border-right:1px solid var(--border)}
+.check-yes{color:var(--accent);font-size:15px;font-weight:800}
+.check-no{color:var(--muted2);font-size:15px}
+.check-part{color:var(--amber);font-size:13px;font-weight:600}
+
+/* ════════════════════════════════════════════════
+   FAQ ACCORDION
+════════════════════════════════════════════════ */
+.faq-section{padding:0 0 96px}
+.faq-list{display:flex;flex-direction:column;gap:10px;max-width:720px;margin:0 auto}
+.faq-item{background:rgba(255,255,255,0.75);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border:1px solid rgba(255,255,255,0.6);border-top:1px solid rgba(255,255,255,0.9);border-left:1px solid rgba(255,255,255,0.9);box-shadow:0 8px 30px rgba(15,23,42,0.06),inset 0 1px 0 rgba(255,255,255,0.6);border-radius:20px;overflow:hidden;transition:border-color .25s,transform .45s cubic-bezier(.2,.8,.2,1),box-shadow .45s cubic-bezier(.2,.8,.2,1)}
+.faq-item.open{border-color:var(--accent)}
+.faq-item:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(15,23,42,0.08),inset 0 1px 0 rgba(255,255,255,0.8)}
+.faq-q{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);transition:color .2s;user-select:none}
+.faq-q:hover{color:var(--accent)}
+.faq-item.open .faq-q{color:var(--accent)}
+.faq-chevron{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .5s cubic-bezier(.16,1,.3,1),border-color .25s,background .3s ease}
+.faq-item.open .faq-chevron{transform:rotate(180deg);border-color:var(--accent);background:var(--accent-muted)}
+.faq-chevron svg{width:10px;height:10px;stroke:var(--muted);transition:stroke .2s}
+.faq-item.open .faq-chevron svg{stroke:var(--accent)}
+.faq-a{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s cubic-bezier(.16,1,.3,1),opacity .4s ease,transform .4s ease,padding .3s ease;padding:0 20px;transform:translateY(-6px)}
+.faq-item.open .faq-a{max-height:300px;opacity:1;padding:0 20px 18px;transform:translateY(0)}
+.faq-a-text{font-size:13.5px;color:var(--muted);line-height:1.72}
+
+/* ════════════════════════════════════════════════
+   FINAL CTA
+════════════════════════════════════════════════ */
+.final-cta-section{padding:0 0 100px}
+.final-cta-card{background:#fff;border:1px solid var(--border);border-radius:28px;padding:clamp(40px,6vw,72px) clamp(24px,5vw,60px);text-align:center;position:relative;overflow:hidden;box-shadow:0 8px 30px rgba(15,23,42,0.08),inset 0 1px 0 rgba(255,255,255,0.6)}
+.final-cta-card::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(13,50,86,.15),transparent)}
+.final-cta-card::after{content:'';position:absolute;bottom:-80px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(13,50,86,.03),transparent 70%);pointer-events:none}
+.final-cta-card .orb-left{position:absolute;top:-60px;left:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(13,50,86,.02),transparent 70%);pointer-events:none}
+.final-cta-title{font-size:clamp(26px,5vw,48px);font-weight:900;line-height:1.1;letter-spacing:-.03em;margin-bottom:14px;position:relative;z-index:1}
+.final-cta-title em{font-style:normal;background:linear-gradient(135deg,var(--spanish-green),var(--blue-gray));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.final-cta-sub{font-size:clamp(13px,2vw,16px);color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto 32px;position:relative;z-index:1}
+.final-cta-actions{display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;z-index:1}
+@media(min-width:480px){.final-cta-actions{flex-direction:row;justify-content:center;gap:14px}}
+.final-cta-note{font-size:11.5px;color:var(--muted2);margin-top:14px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;position:relative;z-index:1}
+.final-note-item{display:flex;align-items:center;gap:4px}
+.final-note-item svg{width:11px;height:11px;stroke:var(--cyan);fill:none;flex-shrink:0}
+
+/* ════════════════════════════════════════════════
+   FOOTER
+════════════════════════════════════════════════ */
+.footer{border-top:1px solid var(--border);padding:32px 0;text-align:center;background:var(--bg)}
+.footer-inner{display:flex;flex-direction:column;align-items:center;gap:12px}
+.footer-brand{font-size:14px;font-weight:700;color:var(--text)}
+.footer-links{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center}
+.footer-link{font-size:12px;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-link:hover{color:var(--accent)}
+.footer-copy{font-size:11px;color:var(--muted2)}
+
+/* ════════════════════════════════════════════════
+   SCROLL REVEAL
+════════════════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(32px) scale(.985);transition:opacity .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0) scale(1)}
+.reveal-delay-1{transition-delay:.1s}
+.reveal-delay-2{transition-delay:.2s}
+.reveal-delay-3{transition-delay:.3s}
+.reveal-delay-4{transition-delay:.4s}
+.reveal-delay-5{transition-delay:.5s}
+
+/* ── Mobile sticky CTA ── */
+.mob-sticky{display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;padding:12px 16px;background:var(--bg);border-top:1px solid var(--border)}
+@media(max-width:639px){.mob-sticky{display:block}}
+.mob-sticky-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px;border-radius:16px;background:linear-gradient(135deg,var(--spanish-green),var(--blue-gray));color:#FFFFFF;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;text-decoration:none;box-shadow:0 8px 32px rgba(13,50,86,0.25),0 2px 8px rgba(0,0,0,0.1);min-height:48px;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s cubic-bezier(.2,.8,.2,1)}
+.mob-sticky-btn:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(13,50,86,0.35),0 4px 16px rgba(0,0,0,0.15);color:#FFFFFF}
+
+/* ── Desktop sticky CTA ── */
+.desktop-sticky-cta{position:fixed;right:32px;bottom:32px;z-index:150;display:none}
+@media(min-width:1024px){.desktop-sticky-cta{display:block}}
+.desktop-sticky-btn{padding:16px 28px;border-radius:16px;background:linear-gradient(135deg,var(--spanish-green),var(--blue-gray));color:#FFFFFF;font-weight:700;font-size:15px;text-decoration:none;box-shadow:0 8px 32px rgba(13,50,86,0.25),0 2px 8px rgba(0,0,0,0.1);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s cubic-bezier(.2,.8,.2,1);font-family:'Outfit',sans-serif;min-height:48px}
+.desktop-sticky-btn:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(13,50,86,0.35),0 6px 20px rgba(0,0,0,0.15);color:#FFFFFF}
+
+/* ── Misc helpers ── */
+.gradient-text{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<canvas id="bgc"></canvas>
+
+<!-- ════ NAV ════ -->
+<nav class="nav" id="mainNav">
+  <div class="wrap">
+    <div class="nav-inner">
+      <a href="#" class="logo-pill">
+        <div class="logo-mark">
+          <img src="https://unlimitr.com/img/hca_logo.svg" alt="Unlimitr" style="width:100%;height:100%;object-fit:contain">
+        </div>
+        <!-- <span class="brand">Unlimitr</span> -->
+      </a>
+      <div class="nav-links">
+        <a href="#how" class="nav-link">How It Works</a>
+        <a href="#features" class="nav-link">What You Get</a>
+        <a href="#testimonials" class="nav-link">Results</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+      </div>
+      <a href="assessment.html" class="nav-cta">
+        Start Free Assessment
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ════ HERO ════ -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap" style="width:100%">
+    <div class="hero-inner">
+
+      <!-- LEFT COPY -->
+      <div class="hero-copy">
+        <div class="hero-eyebrow">
+          <span class="hero-eyebrow-dot"></span>
+          Powered by Unlimitr Biological Intelligence
+        </div>
+        <h1 class="hero-h1">
+          Your body has a<br>
+          <em>biological age.</em><br>
+          Let's decode it.
+        </h1>
+        <p class="hero-desc">
+          Answer 3 minutes of precise questions. Our AI calculates your health score, biological vs chronological age, disease risk profile — and builds a personalised transformation plan that actually fits your life.
+        </p>
+        <div class="hero-cta-row">
+          <a href="assessment.html" class="btn-primary">
+            Take the Free Assessment
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#how" class="btn-ghost">See how it works</a>
+        </div>
+        <div class="hero-trust">
+          <div class="trust-chip">
+            <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Free · Takes 3 mins
+          </div>
+          <div class="trust-chip">
+            <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            100% private
+          </div>
+          <div class="trust-chip">
+            <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+            Instant AI report
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT VISUAL — dashboard mockup -->
+      <div class="hero-visual">
+        <div class="float-badge bio">🧬 Bio Age: 31 yrs<br><span style="font-size:9px;color:var(--muted);font-weight:500">−4 vs chronological age</span></div>
+        <div class="mockup-card">
+          <div class="mockup-shimmer"></div>
+          <div class="mock-header">
+            <div class="mock-title">Unlimitr Biological Intelligence Report</div>
+            <div class="mock-live"> Live</div>
+          </div>
+          <div class="mock-gauge-row">
+            <div class="mock-gauge">
+              <svg viewBox="0 0 80 80">
+                <defs>
+                  <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#008944"/>
+                    <stop offset="100%" stop-color="#0080DD"/>
+                  </linearGradient>
+                  <filter id="gGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                </defs>
+                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(13,50,86,.08)" stroke-width="7" stroke-dasharray="201" stroke-dashoffset="50" transform="rotate(-225 40 40)"/>
+                <circle cx="40" cy="40" r="32" fill="none" stroke="url(#gGrad)" stroke-width="7" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="70" transform="rotate(-225 40 40)" filter="url(#gGlow)" class="gauge-anim"/>
+              </svg>
+              <div class="mock-gauge-num">
+                <span class="mock-score" id="mockScore">78</span>
+                <span class="mock-score-sub">Score</span>
+              </div>
+            </div>
+            <div class="mock-stats">
+              <div class="mock-stat-row"><span class="mock-stat-label">Biological Age</span><span class="mock-stat-val cyan">31</span></div>
+              <div class="mock-stat-row"><span class="mock-stat-label">Chrono Age</span><span class="mock-stat-val">35</span></div>
+              <div class="mock-stat-row"><span class="mock-stat-label">Recovery</span><span class="mock-stat-val">74%</span></div>
+              <div class="mock-stat-row"><span class="mock-stat-label">BMI</span><span class="mock-stat-val">24.2</span></div>
+            </div>
+          </div>
+          <div class="mock-bars">
+            <div class="mock-bar-row">
+              <div class="mock-bar-header"><span class="mock-bar-name">Metabolic Health</span><span class="mock-bar-val">82</span></div>
+              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:82%"></div></div>
+            </div>
+            <div class="mock-bar-row">
+              <div class="mock-bar-header"><span class="mock-bar-name">Sleep Quality</span><span class="mock-bar-val" style="color:var(--amber)">48</span></div>
+              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:48%;background:linear-gradient(90deg,rgba(160,80,0,.6),var(--amber))"></div></div>
+            </div>
+            <div class="mock-bar-row">
+              <div class="mock-bar-header"><span class="mock-bar-name">Stress Resilience</span><span class="mock-bar-val">65</span></div>
+              <div class="mock-bar-track"><div class="mock-bar-fill" style="width:65%"></div></div>
+            </div>
+          </div>
+          <div class="mock-cta">View Full AI Report →</div>
+        </div>
+        <div class="float-badge score">📊 Health Score: 78/100<br><span style="font-size:9px;color:var(--muted);font-weight:500">Strong Foundation</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════ TICKER ════ -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker">
+    <div class="ticker-item"><div class="ticker-dot"></div>Biological Age Analysis</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Disease Risk Percentile</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>BMR &amp; TDEE Calculation</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Metabolic Health Score</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Sleep Quality Index</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Stress Resilience Score</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Transformation Timeline</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>AI-Personalised Plan</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Root Cause Analysis</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Recovery Capacity Score</div>
+    <!-- Duplicate for seamless loop -->
+    <div class="ticker-item"><div class="ticker-dot"></div>Biological Age Analysis</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Disease Risk Percentile</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>BMR &amp; TDEE Calculation</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Metabolic Health Score</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Sleep Quality Index</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Stress Resilience Score</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Transformation Timeline</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>AI-Personalised Plan</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Root Cause Analysis</div>
+    <div class="ticker-item"><div class="ticker-dot"></div>Recovery Capacity Score</div>
+  </div>
+</div>
+
+<!-- ════ PROOF NUMBERS ════ -->
+<div class="proof-section">
+  <div class="wrap">
+    <div class="proof-numbers">
+      <div class="proof-num-cell reveal">
+        <div class="proof-big" data-target="12400">0</div>
+        <div class="proof-label">Assessments<br>Completed</div>
+      </div>
+      <div class="proof-num-cell reveal reveal-delay-1">
+        <div class="proof-big" data-target="94" data-suffix="%">0%</div>
+        <div class="proof-label">Users saw measurable<br>results in 8 weeks</div>
+      </div>
+      <div class="proof-num-cell reveal reveal-delay-2">
+        <div class="proof-big" data-target="4" data-prefix="−" data-suffix=" yrs">0</div>
+        <div class="proof-label">Average biological age<br>reduction in 12 weeks</div>
+      </div>
+      <div class="proof-num-cell reveal reveal-delay-3">
+        <div class="proof-big" data-target="3" data-suffix=" min">0</div>
+        <div class="proof-label">To complete<br>your full assessment</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HOW IT WORKS ════ -->
+<section class="how-section" id="how">
+  <div class="wrap">
+    <div class="section-eyebrow reveal"><span></span>SIMPLE & PRECISE<span></span></div>
+    <h2 class="section-title reveal">Three steps to <em>complete biological clarity.</em></h2>
+    <p class="section-sub reveal">No lab visits. No generic templates.<br>Just your data — interpreted through structured health intelligence.</p>
+
+    <div class="steps-flow">
+      <div class="step-card" data-step="1">
+        <div class="step-num">01</div>
+        <div class="step-divider"></div>
+        <div class="step-name">Structured Assessment</div>
+        <p class="step-desc">Four focused modules covering personal metrics, metabolic signals, lifestyle load, and health conditions.</p>
+        <p class="step-note">Every question serves a purpose.</p>
+        <span class="step-badge s1">⏱ ~3 minutes</span>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-num">02</div>
+        <div class="step-divider"></div>
+        <div class="step-name">Biological Intelligence Report</div>
+        <p class="step-desc">Instant visibility into:</p>
+        <ul class="step-list">
+          <li>Biological age vs chronological</li>
+          <li>Composite health score (0–100)</li>
+          <li>Disease risk percentile</li>
+          <li>Metabolic baseline (BMR & TDEE)</li>
+          <li>Root cause analysis</li>
+        </ul>
+        <p class="step-note">Clear. Measured. Personal.</p>
+        <span class="step-badge s2">🧬 Delivered immediately</span>
+      </div>
+      <div class="step-card" data-step="3">
+        <div class="step-num">03</div>
+        <div class="step-divider"></div>
+        <div class="step-name">Personalised Correction Blueprint</div>
+        <p class="step-desc">Your results unlock a structured transformation plan built around:</p>
+        <ul class="step-list">
+          <li>Your schedule</li>
+          <li>Your restrictions</li>
+          <li>Your recovery capacity</li>
+          <li>Your declared medical conditions</li>
+        </ul>
+        <p class="step-note">Delivered with 1:1 specialists and AI-guided optimisation.</p>
+        <span class="step-badge s3">🏆 Built around you</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ YOUR TIME. YOUR RESTRICTIONS. YOUR HEALTH ════ -->
+<section class="personalized-section" id="features">
+  <div class="wrap">
+    <div class="section-eyebrow reveal"><span></span>PERSONALISED TO YOU<span></span></div>
+    <h2 class="section-title reveal">Your Time. Your Restrictions.<br><em>Your Health.</em></h2>
+    <p class="section-sub reveal">Your time constraints, medical history, food restrictions, recovery capacity, and motivation patterns are built into the system before a plan is created.</p>
+    <p class="section-sub reveal" style="margin-top:8px;font-size:14px;color:var(--muted);font-style:italic;">Nothing is ignored. Nothing is generic.</p>
+
+    <div class="personalized-grid">
+      <div class="personalized-card">
+        <div class="personalized-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"></path>
+            <path d="M7 2v20"></path>
+            <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3v0"></path>
+            <path d="M21 15v7"></path>
+            <path d="M11 8h6"></path>
+            <path d="M11 12h6"></path>
+          </svg>
+        </div>
+        <h3 class="personalized-title">1:1 Clinical Dietitian</h3>
+        <p class="personalized-desc">Your nutrition plan is calculated from your metabolic baseline and adjusted for allergies, hormonal conditions, and lifestyle patterns.</p>
+      </div>
+
+      <div class="personalized-card">
+        <div class="personalized-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6.5 6.5h11v11h-11z"></path>
+            <path d="M6.5 6.5L12 2l5.5 4.5"></path>
+            <path d="M6.5 17.5L12 22l5.5-4.5"></path>
+            <path d="M12 2v20"></path>
+            <path d="M9 12h6"></path>
+          </svg>
+        </div>
+        <h3 class="personalized-title">1:1 Fitness Coach</h3>
+        <p class="personalized-desc">Training intensity, volume, and recovery windows are aligned to your current biological capacity — not assumed averages.</p>
+      </div>
+
+      <div class="personalized-card">
+        <div class="personalized-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8" r="3"></circle>
+            <path d="M12 11v10"></path>
+            <path d="M8 21h8"></path>
+            <path d="M7 15h10"></path>
+          </svg>
+        </div>
+        <h3 class="personalized-title">1:1 Yoga Specialist</h3>
+        <p class="personalized-desc">Mobility, breath regulation, and nervous system stability are integrated based on stress markers and recovery index.</p>
+      </div>
+
+      <div class="personalized-card">
+        <div class="personalized-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44L2 22v-4.5A2.5 2.5 0 0 1 4.5 15H7"></path>
+            <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44L22 22v-4.5A2.5 2.5 0 0 0 19.5 15H17"></path>
+            <path d="M12 6v2"></path>
+            <path d="M12 10v2"></path>
+          </svg>
+        </div>
+        <h3 class="personalized-title">1:1 Mind Coach</h3>
+        <p class="personalized-desc">Behavioral drop-off, stress reactivity, and consistency patterns are addressed through structured accountability and mindset correction.</p>
+      </div>
+
+      <div class="personalized-card">
+        <div class="personalized-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+            <path d="M12 8v4"></path>
+            <path d="M12 16h.01"></path>
+          </svg>
+        </div>
+        <h3 class="personalized-title">Doctor Oversight</h3>
+        <p class="personalized-desc">Declared health conditions such as thyroid, PCOS, diabetes, insulin resistance, injuries, or hypertension are factored into your plan.</p>
+      </div>
+
+      <div class="personalized-card">
+        <div class="personalized-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            <path d="M2 12h20"></path>
+            <path d="M12 2a50.7 50.7 0 0 1 0 20 50.7 50.7 0 0 1 0-20"></path>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+        </div>
+        <h3 class="personalized-title">Personalised Coaching powered by AI Scoring</h3>
+        <p class="personalized-desc">Your assessment score directly influences calorie targets, training structure, correction timeline, and coaching intensity. Not AI advice. Structured AI-guided planning.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ WHAT YOU GET ════ -->
+<section class="features-section" id="what-you-get">
+  <div class="wrap">
+    <div class="section-eyebrow"><span></span>WHAT YOU GET<span></span></div>
+    <h2 class="section-title">Not A Generic Report.<br><em>Your Complete Blueprint.</em></h2>
+    <p class="section-sub">Every output is calculated from your actual data using validated clinical formulas — not averages, not templates.<br>We introduce 8 precision intelligence modules.</p>
+    <!-- <p class="section-sub" style="margin-top:2px;font-size:15px;color:var(--muted);">We introduce 8 precision intelligence modules.</p> -->
+
+    <div class="section-divider reveal"></div>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            <path d="M2 12h20"></path>
+            <path d="M12 2a50.7 50.7 0 0 1 0 20 50.7 50.7 0 0 1 0-20"></path>
+          </svg>
+      </div>
+        <h3 class="feat-title">Biological Age Analysis</h3>
+        <p class="feat-desc">We calculate how your body is functioning relative to your chronological age — based on metabolic output, stress load, sleep integrity, activity density, and declared conditions. This is your functional age.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"></path>
+            <path d="M18 7l-5-5-5 5"></path>
+            <path d="M7 17l5 5 5-5"></path>
+            <path d="M7 7h10"></path>
+            <path d="M7 17h10"></path>
+          </svg>
+      </div>
+        <h3 class="feat-title">Composite Health Score (0–100)</h3>
+        <p class="feat-desc">A weighted model across metabolic health, recovery capacity, hormonal stability, and behavioural resilience. Not a vanity score. A structural index.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="M9 12l2 2 4-4"></path>
+            <path d="M12 8v4"></path>
+            <path d="M12 16h.01"></path>
+          </svg>
+      </div>
+        <h3 class="feat-title">Disease Risk Percentile</h3>
+        <p class="feat-desc">Your relative risk for cardiometabolic conditions compared to your age cohort — presented through weighted percentile mapping. Risk is contextual, not absolute.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+          </svg>
+        </div>
+        <h3 class="feat-title">Metabolic Baseline (BMR & TDEE)</h3>
+        <p class="feat-desc">Calculated using the Mifflin–St Jeor equation and activity modifiers. Your nutrition plan is built on this number — not guesswork.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <h3 class="feat-title">Recovery Capacity Index</h3>
+        <p class="feat-desc">Measures how efficiently your body restores energy between physical and psychological load. Determines training intensity and frequency.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+        <h3 class="feat-title">Sleep & Stress Modelling</h3>
+        <p class="feat-desc">Assesses sleep fragmentation patterns and stress resilience markers to predict biological strain. Fat loss without recovery is regression.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3 class="feat-title">Root Cause Identification</h3>
+        <p class="feat-desc">Identifies the primary bottleneck limiting your progress: Metabolic inefficiency, Hormonal instability, Behavioural drop-off, Recovery deficit. Correction starts here.</p>
+      </div>
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+        </div>
+        <h3 class="feat-title">Structured Transformation Timeline</h3>
+        <p class="feat-desc">A projected 12-week roadmap showing biological correction phases, expected weight adaptation, and metabolic stabilization milestones. Measured progression.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ TESTIMONIALS ════ -->
+<section class="testimonials-section" id="testimonials">
+  <div class="wrap">
+    <div class="section-eyebrow reveal"><span></span>Real Results<span></span></div>
+    <h2 class="section-title reveal">People Who Decoded<br><em>Their Biology First</em></h2>
+    <p class="section-sub reveal" style="margin-bottom:44px">These are real outcomes from people who started exactly where you are.</p>
+
+    <div class="testimonials-grid" id="testiGrid"></div>
+  </div>
+</section>
+
+<!-- ════ COMPARISON ════ -->
+<section class="compare-section">
+  <div class="wrap">
+    <div class="section-eyebrow reveal"><span></span>Why Unlimitr<span></span></div>
+    <h2 class="section-title reveal">How we're <em>different</em></h2>
+    <p class="section-sub reveal" style="margin-bottom:44px">Generic fitness apps give you templates. We give you your biology.</p>
+
+    <div class="compare-wrap reveal">
+      <div class="compare-header">
+        <div class="compare-col-head dim">Feature</div>
+        <div class="compare-col-head dim">Generic Apps</div>
+        <div class="compare-col-head hl">Unlimitr</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell feature">Biological age calculation</div>
+        <div class="compare-cell"><span class="check-no">—</span></div>
+        <div class="compare-cell hl"><span class="check-yes">✓</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell feature">Disease risk percentile</div>
+        <div class="compare-cell"><span class="check-no">—</span></div>
+        <div class="compare-cell hl"><span class="check-yes">✓</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell feature">Clinical BMR / TDEE formula</div>
+        <div class="compare-cell"><span class="check-part">Basic</span></div>
+        <div class="compare-cell hl"><span class="check-yes">✓ Mifflin-St Jeor</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell feature">Health-condition-aware planning</div>
+        <div class="compare-cell"><span class="check-no">—</span></div>
+        <div class="compare-cell hl"><span class="check-yes">✓</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell feature">Root cause analysis</div>
+        <div class="compare-cell"><span class="check-no">—</span></div>
+        <div class="compare-cell hl"><span class="check-yes">✓</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell feature">Week-by-week timeline</div>
+        <div class="compare-cell"><span class="check-part">Generic</span></div>
+        <div class="compare-cell hl"><span class="check-yes">✓ Personalised</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell feature">Takes less than 5 minutes</div>
+        <div class="compare-cell"><span class="check-no">—</span></div>
+        <div class="compare-cell hl"><span class="check-yes">✓ 3 minutes</span></div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell feature">Completely free to start</div>
+        <div class="compare-cell"><span class="check-no">Paid only</span></div>
+        <div class="compare-cell hl"><span class="check-yes">✓ Always free</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FAQ ════ -->
+<section class="faq-section" id="faq">
+  <div class="wrap">
+    <div class="section-eyebrow reveal"><span></span>Questions<span></span></div>
+    <h2 class="section-title reveal">Everything you need to <em>know</em></h2>
+    <p class="section-sub reveal" style="margin-bottom:44px">Plain answers, no fluff.</p>
+    <div class="faq-list" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ════ FINAL CTA ════ -->
+<section class="final-cta-section">
+  <div class="wrap">
+    <div class="final-cta-card reveal">
+      <div class="orb-left"></div>
+      <h2 class="final-cta-title">
+        Your biological age is<br>a number you can <em>change.</em>
+      </h2>
+      <p class="final-cta-sub">
+        3 minutes. Instant results. A plan that's yours alone. The only question is whether you're ready to see what your body is actually doing.
+      </p>
+      <div class="final-cta-actions">
+        <a href="assessment.html" class="btn-primary" style="font-size:16px;padding:16px 36px">
+          Start My Free Assessment
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="final-cta-note">
+        <div class="final-note-item">
+          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Free forever
+        </div>
+        <div class="final-note-item">
+          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          No account needed
+        </div>
+        <div class="final-note-item">
+          <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Results in 3 minutes
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">Unlimitr</div>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Privacy Policy</a>
+        <a href="#" class="footer-link">Terms of Service</a>
+        <a href="#" class="footer-link">Refund Policy</a>
+        <a href="#" class="footer-link">Contact</a>
+      </div>
+      <div class="footer-copy">© 2025 Unlimitr. All rights reserved. Health data is processed locally and never sold.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- Mobile sticky CTA -->
+<div class="mob-sticky" id="mobSticky">
+  <a href="assessment.html" class="mob-sticky-btn">
+    Start Free Assessment — 3 Minutes
+  </a>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   BACKGROUND — DNA helix particle field
+══════════════════════════════════════════════ */
+(function(){
+  const cv=document.getElementById('bgc'),ctx=cv.getContext('2d');
+  let W,H,particles,t=0;
+  function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+  function mkP(){return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.3,vx:(Math.random()-.5)*.14,vy:(Math.random()-.5)*.09,op:Math.random()*.42+.07,hue:Math.random()>.5?180:150}}
+  function helix(t){
+    for(let ci=0;ci<6;ci++)for(let ri=0;ri<4;ri++){
+      const ox=(ci/6)*W+(W/6)*.15,oy=(ri/4)*H+(H/4)*.18,len=200+ri*30,fr=.02+ci*.003,ph=t*.32+ci*1.2+ri*.7;
+      ctx.save();ctx.translate(ox,oy);ctx.rotate(-.25+ci*.09);
+      ctx.beginPath();for(let s=0;s<len;s+=4){const px=s-len/2,py=Math.sin(px*fr+ph)*24;s?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+      ctx.strokeStyle='rgba(13,50,86,.058)';ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();for(let s=0;s<len;s+=4){const px=s-len/2,py=Math.sin(px*fr+ph+Math.PI)*24;s?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+      ctx.strokeStyle='rgba(0,180,255,.045)';ctx.lineWidth=1;ctx.stroke();
+      for(let s=0;s<len;s+=22){const px=s-len/2,pA=Math.sin(px*fr+ph)*24,pB=Math.sin(px*fr+ph+Math.PI)*24;ctx.beginPath();ctx.moveTo(px,pA);ctx.lineTo(px,pB);ctx.strokeStyle='rgba(13,50,86,.032)';ctx.lineWidth=.7;ctx.stroke()}
+      ctx.restore()
+    }
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);t+=.011;
+    // Light theme - subtle gradient
+    const g=ctx.createRadialGradient(W*.45,H*.35,0,W*.45,H*.35,W*.85);
+    g.addColorStop(0,'rgba(248,250,252,.95)');g.addColorStop(.5,'rgba(255,255,255,.98)');g.addColorStop(1,'rgba(255,255,255,1)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    helix(t);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<-4)p.x=W+4;if(p.x>W+4)p.x=-4;if(p.y<-4)p.y=H+4;if(p.y>H+4)p.y=-4;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.hue===180?`rgba(13,50,86,${p.op*0.3})`:`rgba(0,137,68,${p.op*0.3})`;ctx.fill()
+    });
+    requestAnimationFrame(tick)
+  }
+  addEventListener('resize',resize);resize();particles=Array.from({length:120},mkP);tick()
+})();
+
+/* ══════════════════════════════════════════════
+   NAV scroll behaviour
+══════════════════════════════════════════════ */
+const nav=document.getElementById('mainNav');
+const mobSticky=document.getElementById('mobSticky');
+let heroBottom=0;
+function calcHeroBottom(){heroBottom=document.querySelector('.hero').offsetHeight}
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY;
+  nav.classList.toggle('scrolled',y>40);
+  mobSticky.style.opacity=y>300?'1':'0';
+  mobSticky.style.pointerEvents=y>300?'auto':'none';
+});
+mobSticky.style.opacity='0';mobSticky.style.transition='opacity .3s';
+window.addEventListener('load',calcHeroBottom);
+window.addEventListener('resize',calcHeroBottom);
+
+/* ══════════════════════════════════════════════
+   SCROLL REVEAL — intersection observer
+══════════════════════════════════════════════ */
+const revealIO=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revealIO.unobserve(e.target)}})
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>revealIO.observe(el));
+
+/* ══════════════════════════════════════════════
+   COUNT-UP NUMBERS
+══════════════════════════════════════════════ */
+const numIO=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    const el=e.target;
+    const target=parseInt(el.dataset.target||'0');
+    const prefix=el.dataset.prefix||'';
+    const suffix=el.dataset.suffix||'';
+    const dur=1800;const start=performance.now();
+    function step(now){
+      const p=Math.min((now-start)/dur,1);
+      const ease=1-Math.pow(1-p,4);
+      const val=Math.round(target*ease);
+      el.textContent=prefix+(val>=1000?val.toLocaleString('en-IN'):val)+suffix;
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    numIO.unobserve(el);
+  })
+},{threshold:.4});
+document.querySelectorAll('.proof-big[data-target]').forEach(el=>numIO.observe(el));
+
+/* ══════════════════════════════════════════════
+   TESTIMONIALS DATA
+══════════════════════════════════════════════ */
+const testimonials=[
+  {stars:'★★★★★',quote:'"When I saw my biological age was 6 years older than my actual age, it honestly shook me. It wasn\'t dramatic — it was just data. And that made it impossible to ignore.\n\n16 weeks later, I\'m 14 kilos lighter. But more importantly, I feel in control again."',name:'Priya M.',city:'Mumbai',meta:'Lost 14 kg in 16 weeks',color:'rgba(13,50,86,.15)',result:'Biological Age −6 Years'},
+  {stars:'★★★★★',quote:'"The disease risk percentile was higher than I expected. That number stayed with me. I changed my eating habits the same week.\n\nThree months later, I\'m sleeping better, 8 kilos down, and my energy feels stable for the first time in years."',name:'Rahul K.',city:'Bangalore',meta:'8 kg lost · Improved sleep',color:'rgba(13,50,86,.15)',result:'Risk Percentile Reduced'},
+  {stars:'★★★★★',quote:'"Every app gave me the same 1,200 calorie plan. Unlimitr calculated 1,760 based on my metabolism.\n\nI lost weight while eating more. That changed how I see dieting completely."',name:'Sneha R.',city:'Delhi',meta:'11 kg lost · 12 weeks',color:'rgba(245,197,24,.12)',result:'11 kg in 12 weeks'},
+  {stars:'★★★★★',quote:'"With PCOS, nothing worked consistently. This was the first plan that factored in insulin resistance properly.\n\nI finally saw steady progress instead of ups and downs."',name:'Ananya T.',city:'Pune',meta:'PCOS-adapted plan · 9 kg lost',color:'rgba(100,100,255,.14)',result:'PCOS-Aware Plan'},
+  {stars:'★★★★★',quote:'"Seeing 44 when I\'m 38 was uncomfortable. But it was honest.\n\nSix months later, I\'m at 39. That\'s proof this system works — if you follow it."',name:'Vikram S.',city:'Hyderabad',meta:'Biological Age −5 years',color:'rgba(13,50,86,.12)',result:'Biological Age −5 Years'},
+  {stars:'★★★★★',quote:'"The root cause breakdown was eye-opening. Stress was doing more damage than I realised.\n\nIn 3 minutes, I understood what 5 years of trial and error couldn\'t show me."',name:'Meera J.',city:'Chennai',meta:'Health Score 52 → 78',color:'rgba(13,50,86,.12)',result:'Health Score +26 Points'},
+];
+
+const grid=document.getElementById('testiGrid');
+const avatarColors=['rgba(13,50,86,.15)','rgba(13,50,86,.15)','rgba(255,195,5,.15)','rgba(0,128,221,.15)','rgba(13,50,86,.12)','rgba(255,195,5,.15)'];
+testimonials.forEach((t,i)=>{
+  const initials=t.name.split(' ').map(n=>n[0]).join('');
+  const el=document.createElement('div');el.className='testi-card reveal reveal-delay-'+(i%3+1);
+  el.style.background='rgba(255,255,255,0.75)';
+  el.innerHTML=`<div class="testi-stars">${t.stars}</div><div class="testi-quote">${t.quote.replace(/\n/g,'<br>')}</div><div class="testi-author"><div class="testi-avatar" style="background:${avatarColors[i]}">${initials}</div><div><div class="testi-name">${t.name} <span style="font-size:11px;color:var(--muted);font-weight:400">· ${t.city}</span></div><div class="testi-meta">${t.meta}</div></div></div><div class="testi-result win">✓ ${t.result}</div>`;
+  grid.appendChild(el);
+  revealIO.observe(el);
+});
+
+/* ══════════════════════════════════════════════
+   FAQ DATA
+══════════════════════════════════════════════ */
+const faqs=[
+  {q:'Is the assessment really free?',a:'Yes, completely. The assessment, your AI health report, biological age score, health score dashboard, and transformation timeline are all free. You only pay if you choose to unlock the personalised coaching plan — which is optional.'},
+  {q:'How is my biological age calculated?',a:'We use a composite algorithm that factors in your BMI, activity level, sleep quality, stress levels, and any reported health conditions. Each factor contributes a weighted adjustment (positive or negative) to your chronological age. For example, poor sleep adds ~3 years; high activity subtracts ~2.5. This approach is based on peer-reviewed epigenetic and metabolic ageing research.'},
+  {q:'Do I need any blood tests or medical devices?',a:'No. All calculations are based on self-reported inputs — the same information your doctor would ask during a lifestyle consultation. For deeper medical metrics (HbA1c, TSH), we accept optional inputs if you have them, but they\'re never required.'},
+  {q:'How accurate is the health score and disease risk?',a:'Our engine uses the clinically validated Mifflin-St Jeor formula for metabolic calculations, and the disease risk percentile is derived from population-level epidemiological data. While not a medical diagnosis, the scores are directionally accurate enough to identify meaningful areas for intervention.'},
+  {q:'What happens after I complete the assessment?',a:'You\'re taken directly to your personal AI Health Dashboard showing all your scores, the biological age visualisation, radar chart, disease risk arch gauge, root cause analysis, and transformation timeline. From there, you can optionally unlock a personalised coaching plan.'},
+  {q:'What\'s included in the paid plan?',a:'The personalised plan includes your exact calorie and macro targets, a week-by-week training programme matched to your commitment level, diet-preference-matched meal plans, WhatsApp accountability check-ins, monthly coach calls, and weekly AI recalibration of your plan based on your progress. Plans start at ₹7,999 with a 50% launch discount.'},
+  {q:'Is my health data private?',a:'All data is processed locally in your browser session using localStorage. We do not send your health data to external servers without your consent. Your email is only used to send your report summary if you request it.'},
+];
+
+const faqList=document.getElementById('faqList');
+faqs.forEach((f,i)=>{
+  const el=document.createElement('div');el.className='faq-item reveal';
+  el.innerHTML=`<div class="faq-q"><span>${f.q}</span><div class="faq-chevron"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div></div><div class="faq-a"><div class="faq-a-text">${f.a}</div></div>`;
+  faqList.appendChild(el);
+  revealIO.observe(el);
+  el.querySelector('.faq-q').addEventListener('click',()=>{
+    const isOpen=el.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(o=>o.classList.remove('open'));
+    if(!isOpen)el.classList.add('open');
+  });
+});
+
+/* ══════════════════════════════════════════════
+   MOCKUP GAUGE — animated stroke on scroll
+══════════════════════════════════════════════ */
+const gaugeAnim=document.querySelector('.gauge-anim');
+if(gaugeAnim){
+  let animated=false;
+  const gaugeIO=new IntersectionObserver((entries)=>{
+    if(entries[0].isIntersecting&&!animated){
+      animated=true;
+      // Already visible on load — animate after slight delay
+      setTimeout(()=>{
+        gaugeAnim.style.transition='stroke-dashoffset 2s cubic-bezier(.4,0,.2,1)';
+        gaugeAnim.style.strokeDashoffset='70';
+      },600);
+    }
+  },{threshold:.3});
+  gaugeIO.observe(document.querySelector('.hero-visual'));
+}
+
+/* ══════════════════════════════════════════════
+   GSAP — subtle parallax and stagger
+══════════════════════════════════════════════ */
+if(window.gsap&&window.ScrollTrigger){
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero glow parallax
+  gsap.to('.hero-glow',{
+    y:-60,scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}
+  });
+
+  // Mockup card subtle tilt on scroll
+  gsap.to('.mockup-card',{
+    rotateX:5,y:20,
+    scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:true}
+  });
+
+  // Step card macro-animations (controlled, no bounce)
+  const stepCards = document.querySelectorAll('.step-card');
+  const stepObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('animate');
+        }, index * 100); // Stagger each card by 100ms
+        stepObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+
+  stepCards.forEach(card => {
+    stepObserver.observe(card);
+  });
+
+  // Personalized cards animation
+  const personalizedCards = document.querySelectorAll('.personalized-card');
+  if (personalizedCards.length > 0 && typeof gsap !== 'undefined') {
+    // Set initial invisible state
+    gsap.set('.personalized-card', { opacity: 0, y: 16 });
+    
+    // Animate on scroll
+    gsap.to('.personalized-card', {
+      opacity: 1,
+      y: 0,
+      stagger: 0.1,
+      duration: 0.6,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.personalized-grid',
+        start: 'top 80%'
+      }
+    });
+  }
+
+  // What You Get section animations
+  const featCards = document.querySelectorAll('.feat-card');
+  if (featCards.length > 0) {
+    // Set initial invisible state
+    gsap.set('.feat-card', { opacity: 0, y: 24 });
+  }
+
+  // Headline fade in (only animate if GSAP is available)
+  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+    // Animate heading on scroll (heading is visible by default)
+    gsap.from('.features-section .section-title', {
+      opacity: 0,
+      y: 20,
+      duration: 0.7,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.features-section',
+        start: 'top 80%'
+      }
+    });
+  }
+
+  // Divider expand
+  const divider = document.querySelector('.section-divider');
+  if (divider) {
+    gsap.to(divider, {
+      scaleX: 1,
+      opacity: 1,
+      width: '100%',
+      duration: 0.6,
+      scrollTrigger: {
+        trigger: '.features-section',
+        start: 'top 80%'
+      },
+      onComplete: () => {
+        divider.classList.add('revealed');
+      }
+    });
+  }
+
+  // Feature cards staggered reveal
+  gsap.to('.feat-card', {
+    opacity: 1,
+    y: 0,
+    stagger: 0.1,
+    duration: 0.6,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '.features-grid',
+      start: 'top 80%'
+    }
+  });
+
+  // Final CTA glow pulse
+  gsap.to('.final-cta-card',{
+    boxShadow:'0 8px 30px rgba(15,23,42,0.08),inset 0 1px 0 rgba(255,255,255,0.6),0 0 40px rgba(13,50,86,.05)',
+    duration:2.5,ease:'sine.inOut',repeat:-1,yoyo:true,
+    scrollTrigger:{trigger:'.final-cta-card',start:'top 80%'}
+  });
+}
+
+/* ══════════════════════════════════════════════
+   SMOOTH ANCHOR SCROLLING
+══════════════════════════════════════════════ */
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const target=document.querySelector(a.getAttribute('href'));
+    if(target){e.preventDefault();target.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
+});
+</script>
+
+<!-- Desktop Sticky CTA -->
+<div class="desktop-sticky-cta">
+  <a href="assessment.html" class="desktop-sticky-btn">
+    Start Free Assessment →
+  </a>
+</div>
+</body>
+</html>

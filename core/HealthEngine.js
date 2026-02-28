@@ -161,6 +161,14 @@
     // Calculate biological strain
     this.biologicalStrain = this.calculateBiologicalStrain();
 
+    // Calculate biological age (if age available)
+    var biologicalAge = null;
+    var biologicalAgeDelta = null;
+    if (this.user.age && this.user.age > 0) {
+      biologicalAge = this.calculateBiologicalAge(parseInt(this.user.age, 10));
+      biologicalAgeDelta = biologicalAge - parseInt(this.user.age, 10);
+    }
+
     // Return structured output (matches user's specification exactly)
     var output = {
       totalScore: this.totalScore,
@@ -174,6 +182,10 @@
 
     // Enhanced fields (optional, for UI intelligence)
     output.biologicalStrain = this.biologicalStrain;
+    if (biologicalAge !== null) {
+      output.biologicalAge = biologicalAge;
+      output.biologicalAgeDelta = biologicalAgeDelta;
+    }
     output.dimensionNarratives = this.generateAllDimensionNarratives();
     output.mlFeatures = this.extractMLFeatures();
     output.timestamp = new Date().toISOString();
@@ -333,7 +345,7 @@
 
   /**
    * BIOLOGICAL STRAIN CALCULATION
-   * Composite measure of system stress
+   * Composite measure of system stress (0-100 scale)
    */
   HealthEngine.prototype.calculateBiologicalStrain = function () {
     var strain = 0;
@@ -347,6 +359,53 @@
     strain += (100 - dims.readiness) * 0.15;
 
     return Math.round(Math.max(0, Math.min(100, strain)));
+  };
+
+  /**
+   * BIOLOGICAL AGE CALCULATION (Production-Safe)
+   * Converts health scores to realistic age deviation
+   * Max deviation: +8 years (older) / -6 years (younger)
+   * 
+   * @param {Number} chronologicalAge - User's actual age
+   * @returns {Number} Biological age (clamped to realistic band)
+   */
+  HealthEngine.prototype.calculateBiologicalAge = function (chronologicalAge) {
+    if (!chronologicalAge || chronologicalAge <= 0) {
+      return chronologicalAge || 30; // Safety fallback
+    }
+
+    var dims = this.dimensions;
+    
+    // Calculate composite health index (0-100)
+    var compositeHealthIndex =
+      (dims.metabolic || 60) * 0.25 +
+      (dims.recovery || 60) * 0.20 +
+      (dims.hormonal || 60) * 0.20 +
+      (dims.behavioral || 60) * 0.20 +
+      (dims.readiness || 60) * 0.15;
+
+    // Convert health index to age deviation
+    // Health index 100 = -6 years (younger)
+    // Health index 0 = +8 years (older)
+    // Linear mapping: deviation = (100 - healthIndex) / 12
+    var deviation = (100 - compositeHealthIndex) / 12;
+
+    // Calculate biological age
+    var biologicalAge = chronologicalAge + deviation;
+
+    // Clamp to realistic band (max +8, min -6)
+    var maxDeviation = 8;
+    var minDeviation = -6;
+
+    if (biologicalAge > chronologicalAge + maxDeviation) {
+      biologicalAge = chronologicalAge + maxDeviation;
+    }
+
+    if (biologicalAge < chronologicalAge + minDeviation) {
+      biologicalAge = chronologicalAge + minDeviation;
+    }
+
+    return Math.round(biologicalAge);
   };
 
   /**

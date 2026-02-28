@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Payment Successful — Unlimitr</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Brand Colors */
+  --primary-indigo: #0D3256;
+  --spanish-green: #008944;
+  --blue-gray: #0080DD;
+  --earth-yellow: #FFC305;
+  --dark-pastel-red: #FF0A0A;
+  
+  /* Light Theme */
+  --bg: #FFFFFF;
+  --card: rgba(255,255,255,0.95);
+  --border: rgba(13,50,86,0.12);
+  --cyan: var(--blue-gray);
+  --cyan2: var(--spanish-green);
+  --cyan-dim: rgba(0,128,221,0.12);
+  --green: var(--spanish-green);
+  --amber: var(--earth-yellow);
+  --red: var(--dark-pastel-red);
+  --gold: var(--earth-yellow);
+  --text: #0F172A;
+  --muted: rgba(100,116,139,0.7);
+  --muted2: rgba(100,116,139,0.5);
+  --radius: 20px;
+}
+html,body{width:100%;min-height:100%;background:radial-gradient(circle at 20% 10%,rgba(13,50,86,0.02),transparent 40%),radial-gradient(circle at 80% 90%,rgba(0,137,68,0.02),transparent 40%),var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+
+/* ── Background Canvas ── */
+#bgc{display:none}
+
+/* ── Scan line overlay ── */
+body::after{display:none}
+
+/* ── Page ── */
+.page{position:relative;z-index:2;max-width:680px;margin:0 auto;padding:40px 16px 100px;min-height:100vh;display:flex;align-items:center;justify-content:center}
+@media(min-width:640px){.page{padding:60px 24px 120px}}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulseCyan{0%,100%{box-shadow:0 0 0 0 rgba(0,221,180,0)}50%{box-shadow:0 0 18px 4px rgba(0,221,180,.28)}}
+@keyframes shimmerSlide{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
+@keyframes checkmarkDraw{0%{stroke-dashoffset:100}100%{stroke-dashoffset:0}}
+@keyframes confetti{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(360deg);opacity:0}}
+
+/* ── Success Card ── */
+.success-card{background:rgba(255,255,255,0.95);border:1px solid rgba(13,50,86,.15);border-radius:28px;padding:clamp(32px,6vw,56px) clamp(24px,5vw,48px);backdrop-filter:blur(24px);box-shadow:0 8px 30px rgba(15,23,42,0.08),inset 0 1px 0 rgba(255,255,255,0.6);position:relative;overflow:hidden;text-align:center;opacity:0;animation:fadeUp .9s cubic-bezier(.22,1,.36,1) .3s forwards}
+.success-card::before{content:'';position:absolute;top:0;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,rgba(13,50,86,.15),transparent)}
+.success-card::after{content:'';position:absolute;bottom:-80px;right:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(13,50,86,.03) 0%,transparent 70%);pointer-events:none}
+
+/* Shimmer on card */
+.card-shimmer{position:absolute;top:0;left:0;width:45%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.028),transparent);pointer-events:none;animation:shimmerSlide 4s ease-in-out 1.5s infinite}
+
+/* Success Icon */
+.success-icon-wrap{margin:0 auto 28px;width:120px;height:120px;position:relative;opacity:0;animation:fadeIn .6s ease .6s forwards}
+.success-icon-circle{width:120px;height:120px;border-radius:50%;background:linear-gradient(135deg,rgba(0,137,68,.15),rgba(0,128,221,.12));border:2px solid rgba(0,137,68,.3);display:flex;align-items:center;justify-content:center;position:relative;animation:pulseCyan 3s ease-in-out 1.5s infinite}
+.success-checkmark{width:60px;height:60px;stroke:var(--spanish-green);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;fill:none;stroke-dasharray:100;stroke-dashoffset:100;animation:checkmarkDraw 1s ease .9s forwards}
+.success-icon-wrap::after{content:'';position:absolute;inset:-8px;border-radius:50%;background:radial-gradient(circle,rgba(0,137,68,.12),transparent 70%);animation:breathe 3s ease-in-out 2s infinite}
+
+/* Content */
+.success-title{font-size:clamp(28px,5vw,42px);font-weight:900;line-height:1.1;letter-spacing:-.03em;margin-bottom:14px;opacity:0;animation:fadeUp .8s ease .8s forwards}
+.success-title em{font-style:normal;background:linear-gradient(135deg,var(--spanish-green),var(--blue-gray));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.success-sub{font-size:clamp(14px,2.5vw,17px);color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto 32px;opacity:0;animation:fadeUp .8s ease 1s forwards}
+
+/* Order Details */
+.order-details{background:rgba(255,255,255,0.9);border:1px solid rgba(13,50,86,.12);border-radius:18px;padding:24px;margin-bottom:32px;text-align:left;opacity:0;animation:fadeUp .8s ease 1.2s forwards}
+.order-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(13,50,86,.08)}
+.order-row:last-child{border-bottom:none;font-weight:700;font-size:16px;padding-top:16px}
+.order-label{font-size:13px;color:var(--muted);font-weight:500}
+.order-value{font-size:14px;color:var(--text);font-weight:600}
+.order-value.plan-name{color:var(--blue-gray);font-size:15px}
+.order-value.amount{font-size:18px;background:linear-gradient(135deg,var(--spanish-green),var(--blue-gray));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800}
+
+/* Next Steps */
+.next-steps{background:rgba(0,137,68,.08);border:1px solid rgba(0,137,68,.2);border-radius:18px;padding:24px;margin-bottom:32px;opacity:0;animation:fadeUp .8s ease 1.4s forwards}
+.next-steps-title{font-size:15px;font-weight:700;color:var(--spanish-green);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.next-steps-title svg{width:18px;height:18px;stroke:var(--spanish-green);fill:none}
+.next-steps-list{display:flex;flex-direction:column;gap:12px}
+.next-step-item{display:flex;align-items:flex-start;gap:12px;font-size:13.5px;color:var(--text);line-height:1.6}
+.next-step-icon{width:20px;height:20px;border-radius:6px;background:rgba(0,137,68,.15);border:1px solid rgba(0,137,68,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.next-step-icon svg{width:10px;height:10px;stroke:var(--spanish-green);fill:none;stroke-width:2.5}
+
+/* CTA Buttons */
+.cta-group{display:flex;flex-direction:column;gap:12px;opacity:0;animation:fadeUp .8s ease 1.6s forwards}
+@media(min-width:480px){.cta-group{flex-direction:row;justify-content:center}}
+.cta-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 32px;border-radius:16px;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;text-decoration:none;transition:transform .2s,box-shadow .2s;letter-spacing:.01em}
+.cta-btn-primary{background:linear-gradient(135deg,var(--spanish-green),var(--blue-gray));color:#FFFFFF;box-shadow:0 8px 32px rgba(13,50,86,0.25),0 2px 8px rgba(0,0,0,0.1);border-radius:16px;padding:16px 32px;font-size:15px;font-weight:700;min-height:48px}
+.cta-btn-primary:hover{transform:translateY(-4px);box-shadow:0 16px 48px rgba(13,50,86,0.35),0 6px 20px rgba(0,0,0,0.15);color:#FFFFFF}
+.cta-btn-secondary{background:transparent;color:var(--primary-indigo);border:1.5px solid rgba(13,50,86,.2);box-shadow:0 4px 16px rgba(0,0,0,.08);border-radius:16px;padding:14px 28px;font-size:15px;font-weight:600;min-height:48px}
+.cta-btn-secondary:hover{background:rgba(13,50,86,.08);border-color:var(--primary-indigo);transform:translateY(-2px);color:var(--primary-indigo)}
+
+/* Trust Note */
+.trust-note{font-size:12px;color:var(--muted2);text-align:center;margin-top:24px;opacity:0;animation:fadeUp .7s ease 1.8s forwards;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:5px}
+.trust-item svg{width:12px;height:12px;stroke:var(--cyan);fill:none;flex-shrink:0}
+
+/* Confetti Animation */
+.confetti-container{position:fixed;inset:0;z-index:10;pointer-events:none;overflow:hidden}
+.confetti-piece{position:absolute;width:8px;height:8px;background:var(--cyan);border-radius:2px;opacity:0}
+.confetti-piece:nth-child(2n){background:var(--cyan2)}
+.confetti-piece:nth-child(3n){background:var(--green)}
+.confetti-piece:nth-child(4n){background:var(--gold)}
+</style>
+</head>
+<body>
+<canvas id="bgc"></canvas>
+
+<div class="page">
+  <div class="success-card">
+    <div class="card-shimmer"></div>
+    
+    <!-- Success Icon -->
+    <div class="success-icon-wrap">
+      <div class="success-icon-circle">
+        <svg class="success-checkmark" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Title -->
+    <h1 class="success-title">Payment <em>Successful!</em></h1>
+    <p class="success-sub">Your transformation plan has been activated. Welcome to your structured correction journey.</p>
+    
+    <!-- Order Details -->
+    <div class="order-details" id="orderDetails">
+      <div class="order-row">
+        <span class="order-label">Plan Name</span>
+        <span class="order-value plan-name" id="orderPlanName">—</span>
+      </div>
+      <div class="order-row">
+        <span class="order-label">Payment ID</span>
+        <span class="order-value" id="orderPaymentId">—</span>
+      </div>
+      <div class="order-row">
+        <span class="order-label">Amount Paid</span>
+        <span class="order-value amount" id="orderAmount">—</span>
+      </div>
+    </div>
+    
+    <!-- Next Steps -->
+    <div class="next-steps">
+      <div class="next-steps-title">
+        <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        What Happens Next
+      </div>
+      <div class="next-steps-list">
+        <div class="next-step-item">
+          <div class="next-step-icon">
+            <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div>You'll receive a confirmation email with your plan details and access instructions within the next 5 minutes.</div>
+        </div>
+        <div class="next-step-item">
+          <div class="next-step-icon">
+            <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div>Our team will contact you via WhatsApp within 24 hours to set up your personalized coaching schedule.</div>
+        </div>
+        <div class="next-step-item">
+          <div class="next-step-icon">
+            <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div>Your AI health dashboard and weekly meal plans will be accessible through the Unlimitr app starting tomorrow.</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- CTA Buttons -->
+    <div class="cta-group">
+      <a href="journey-ultra.html" class="cta-btn cta-btn-primary">
+        View My Dashboard
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="landing-upgraded.html" class="cta-btn cta-btn-secondary">
+        Back to Home
+      </a>
+    </div>
+    
+    <!-- Trust Note -->
+    <div class="trust-note">
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Secure payment processed
+      </div>
+      <div class="trust-item">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Plan activated instantly
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confetti Container -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   BACKGROUND — same DNA helix as other pages
+══════════════════════════════════════════════════ */
+(function(){
+  const cv=document.getElementById('bgc'),ctx=cv.getContext('2d');
+  let W,H,particles,t=0;
+  function resize(){W=cv.width=innerWidth;H=cv.height=innerHeight}
+  function mkP(){return{x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.5+.3,vx:(Math.random()-.5)*.13,vy:(Math.random()-.5)*.09,op:Math.random()*.4+.07,hue:Math.random()>.5?180:150}}
+  function helix(t){
+    for(let ci=0;ci<4;ci++)for(let ri=0;ri<3;ri++){
+      const ox=(ci/4)*W+(W/4)*.18,oy=(ri/3)*H+(H/3)*.2,len=180+ri*30,fr=.02+ci*.003,ph=t*.35+ci*1.2+ri*.7;
+      ctx.save();ctx.translate(ox,oy);ctx.rotate(-.25+ci*.1);
+      ctx.beginPath();for(let s=0;s<len;s+=4){const px=s-len/2,py=Math.sin(px*fr+ph)*22;s?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+      ctx.strokeStyle='rgba(13,50,86,.04)';ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();for(let s=0;s<len;s+=4){const px=s-len/2,py=Math.sin(px*fr+ph+Math.PI)*22;s?ctx.lineTo(px,py):ctx.moveTo(px,py)}
+      ctx.strokeStyle='rgba(0,137,68,.03)';ctx.lineWidth=1;ctx.stroke();
+      ctx.restore()
+    }
+  }
+  function tick(){
+    ctx.clearRect(0,0,W,H);t+=.012;
+    // Light theme - subtle gradient
+    const g=ctx.createRadialGradient(W*.5,H*.35,0,W*.5,H*.35,W*.8);
+    g.addColorStop(0,'rgba(248,250,252,.95)');g.addColorStop(.55,'rgba(255,255,255,.98)');g.addColorStop(1,'rgba(255,255,255,1)');
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    helix(t);
+    particles.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<-4)p.x=W+4;if(p.x>W+4)p.x=-4;if(p.y<-4)p.y=H+4;if(p.y>H+4)p.y=-4;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.hue===180?`rgba(13,50,86,${p.op*0.3})`:`rgba(0,137,68,${p.op*0.3})`;ctx.fill()
+    });
+    requestAnimationFrame(tick)
+  }
+  addEventListener('resize',resize);resize();particles=Array.from({length:90},mkP);tick()
+})();
+
+/* ══════════════════════════════════════════════════
+   LOAD ORDER DETAILS
+══════════════════════════════════════════════════ */
+function loadOrderDetails(){
+  // Get payment ID from URL
+  const urlParams=new URLSearchParams(window.location.search);
+  const paymentId=urlParams.get('payment_id')||urlParams.get('razorpay_payment_id')||'N/A';
+  
+  // Get plan details from localStorage
+  let planName='Structured Correction Plan';
+  let amount='₹7,999';
+  
+  try{
+    const stored=localStorage.getItem('recommendedPlan');
+    if(stored){
+      const plan=JSON.parse(stored);
+      if(plan.name) planName=plan.name;
+      if(plan.price) amount='₹'+plan.price.toLocaleString('en-IN');
+    }
+  }catch(e){}
+  
+  // Update DOM
+  document.getElementById('orderPlanName').textContent=planName;
+  document.getElementById('orderPaymentId').textContent=paymentId.substring(0,20)+'...';
+  document.getElementById('orderAmount').textContent=amount;
+}
+
+/* ══════════════════════════════════════════════════
+   CONFETTI ANIMATION
+══════════════════════════════════════════════════ */
+function createConfetti(){
+  const container=document.getElementById('confettiContainer');
+  const colors=['#008944','#0080DD','#0D3256','#FFC305'];
+  const count=50;
+  
+  for(let i=0;i<count;i++){
+    const piece=document.createElement('div');
+    piece.className='confetti-piece';
+    piece.style.left=Math.random()*100+'%';
+    piece.style.top='-10px';
+    piece.style.background=colors[Math.floor(Math.random()*colors.length)];
+    piece.style.animationDelay=Math.random()*0.5+'s';
+    piece.style.animation=`confetti ${2+Math.random()*2}s ease-out forwards`;
+    container.appendChild(piece);
+  }
+  
+  // Clean up after animation
+  setTimeout(()=>{
+    container.innerHTML='';
+  },4000);
+}
+
+/* ══════════════════════════════════════════════════
+   INITIALIZE
+══════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',function(){
+  loadOrderDetails();
+  setTimeout(createConfetti,800);
+});
+</script>
+</body>
+</html>

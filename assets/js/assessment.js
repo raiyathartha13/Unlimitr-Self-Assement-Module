@@ -25,9 +25,17 @@
   if (dobInput && typeof flatpickr !== "undefined") {
     const today = new Date();
     const maxDate = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
+    const isMobile = window.innerWidth < 768;
     flatpickr(dobInput, {
       dateFormat: "Y-m-d",
       maxDate: maxDate,
+      static: false, // Allow calendar to position dynamically
+      positionElement: isMobile ? dobInput : undefined, // On mobile, position relative to input
+      appendTo: isMobile ? document.body : undefined, // On mobile, append to body for proper z-index
+      clickOpens: true, // Ensure calendar opens on click
+      allowInput: true, // Allow manual input
+      mobileNative: false, // Force flatpickr UI even on mobile
+      zIndex: 99999, // High z-index for mobile
       onChange: function (selectedDates, dateStr) {
         if (ageField && dateStr) {
           const dob = new Date(dateStr);
@@ -36,6 +44,24 @@
           const m = today.getMonth() - dob.getMonth();
           if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
           ageField.value = age;
+        }
+      },
+      onOpen: function(selectedDates, dateStr, instance) {
+        // Ensure calendar is visible on mobile
+        if (isMobile) {
+          setTimeout(() => {
+            const calendar = instance.calendarContainer;
+            if (calendar) {
+              calendar.style.zIndex = '99999';
+              calendar.style.position = 'fixed';
+              // Position calendar above input
+              const rect = dobInput.getBoundingClientRect();
+              calendar.style.top = (rect.bottom + 8) + 'px';
+              calendar.style.left = '16px';
+              calendar.style.right = '16px';
+              calendar.style.width = 'auto';
+            }
+          }, 10);
         }
       }
     });

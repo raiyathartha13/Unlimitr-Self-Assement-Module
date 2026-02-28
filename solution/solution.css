@@ -4,19 +4,20 @@
  */
 
 :root {
-  --emerald: #0E3D2F;
-  --emerald-light: #0F9D58;
-  --accent-teal: #2FD4B5;
-  --background: #F4F7F6;
-  --danger-red: #E05656;
-  --premium-gold: #C8A24D;
-  --dark: #1A1A1A;
-  --muted: #6B7280;
-  --glass: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.3);
-  --shadow-sm: 0 4px 16px rgba(14, 61, 47, 0.08);
-  --shadow-md: 0 8px 32px rgba(14, 61, 47, 0.12);
-  --shadow-lg: 0 16px 48px rgba(14, 61, 47, 0.16);
+  /* Using Brand Variables */
+  --emerald: var(--primary-indigo, #0D3256);
+  --emerald-light: var(--spanish-green, #008944);
+  --accent-teal: var(--blue-gray, #0080DD);
+  --background: var(--bg-soft, #F8FAFC);
+  --danger-red: var(--dark-pastel-red, #FF0A0A);
+  --premium-gold: var(--earth-yellow, #FFC305);
+  --dark: var(--text-main, #0F172A);
+  --muted: var(--text-secondary, #64748B);
+  --glass: var(--card-bg, rgba(255, 255, 255, 0.95));
+  --glass-border: var(--card-border, rgba(13, 50, 86, 0.12));
+  --shadow-sm: 0 4px 16px rgba(13, 50, 86, 0.08);
+  --shadow-md: 0 8px 32px rgba(13, 50, 86, 0.12);
+  --shadow-lg: 0 16px 48px rgba(13, 50, 86, 0.16);
 }
 
 * {
@@ -26,9 +27,9 @@
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--background);
-  color: var(--dark);
+  font-family: var(--font-body, 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+  background: var(--bg, var(--background));
+  color: var(--text-main, var(--dark));
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

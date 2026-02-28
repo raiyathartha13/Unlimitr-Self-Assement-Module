@@ -9,27 +9,36 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#05070f;
-  --card:rgba(10,20,45,0.78);
-  --border:rgba(0,220,180,0.13);
-  --cyan:#00ddb4;
-  --cyan2:#00b8ff;
-  --cyan-dim:rgba(0,221,180,0.14);
-  --amber:#ffa94d;
-  --red:#ff5959;
-  --gold:#f5c518;
-  --text:#e2f0ff;
-  --muted:rgba(160,200,240,0.52);
-  --muted2:rgba(130,170,220,0.35);
-  --radius:20px;
+  /* Brand Colors */
+  --primary-indigo: #0D3256;
+  --spanish-green: #008944;
+  --blue-gray: #0080DD;
+  --earth-yellow: #FFC305;
+  --dark-pastel-red: #FF0A0A;
+  
+  /* Light Theme */
+  --bg: #FFFFFF;
+  --bg-soft: #F8FAFC;
+  --card: rgba(255,255,255,0.95);
+  --border: rgba(13,50,86,0.12);
+  --cyan: var(--blue-gray);
+  --cyan2: var(--spanish-green);
+  --cyan-dim: rgba(0,128,221,0.12);
+  --amber: var(--earth-yellow);
+  --red: var(--dark-pastel-red);
+  --gold: var(--earth-yellow);
+  --text: #0F172A;
+  --muted: rgba(100,116,139,0.7);
+  --muted2: rgba(100,116,139,0.5);
+  --radius: 20px;
 }
 html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;overflow-x:hidden;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
 
 /* ── Background Canvas ── */
 #bgc{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
 
-/* ── Scan line overlay ── */
-body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,221,180,.012) 2px,rgba(0,221,180,.012) 4px);pointer-events:none}
+/* ── Scan line overlay ── (removed for light theme) */
+body::after{display:none}
 
 /* ── Page ── */
 .page{position:relative;z-index:2;max-width:880px;margin:0 auto;padding:24px 16px 100px}
@@ -39,14 +48,14 @@ body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-lin
 /* ── Animations ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@keyframes pulseCyan{0%,100%{box-shadow:0 0 0 0 rgba(0,221,180,0)}50%{box-shadow:0 0 18px 4px rgba(0,221,180,.28)}}
-@keyframes pulseGold{0%,100%{box-shadow:0 0 0 0 rgba(245,197,24,0)}50%{box-shadow:0 0 20px 6px rgba(245,197,24,.22)}}
+@keyframes pulseCyan{0%,100%{box-shadow:0 0 0 0 rgba(0,128,221,0)}50%{box-shadow:0 0 18px 4px rgba(0,128,221,.2)}}
+@keyframes pulseGold{0%,100%{box-shadow:0 0 0 0 rgba(255,195,5,0)}50%{box-shadow:0 0 20px 6px rgba(255,195,5,.2)}}
 @keyframes shimmerSlide{0%{transform:translateX(-120%)}100%{transform:translateX(220%)}}
 @keyframes countdownBlink{0%,100%{opacity:1}49%{opacity:1}50%{opacity:.5}99%{opacity:.5}}
 @keyframes scanline{0%{top:-100%}100%{top:200%}}
 @keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.015)}}
 @keyframes dotFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-@keyframes urgencyPulse{0%,100%{background:rgba(255,89,89,.12)}50%{background:rgba(255,89,89,.22)}}
+@keyframes urgencyPulse{0%,100%{background:rgba(255,10,10,.12)}50%{background:rgba(255,10,10,.22)}}
 @keyframes chipAppear{from{opacity:0;transform:translateY(8px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
 
 /* ── Header ── */
@@ -54,7 +63,7 @@ body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-lin
 .logo-pill{display:flex;align-items:center;gap:10px}
 .logo-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--cyan),var(--cyan2));display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .brand{font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--cyan),var(--cyan2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.slots-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:5px 12px;border-radius:999px;background:rgba(255,89,89,.15);color:var(--red);border:1px solid rgba(255,89,89,.3);animation:pulseCyan 3s ease-in-out infinite}
+.slots-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:5px 12px;border-radius:999px;background:rgba(255,10,10,.15);color:var(--red);border:1px solid rgba(255,10,10,.3);animation:pulseCyan 3s ease-in-out infinite}
 
 /* ── Hero Block ── */
 .hero-wrap{text-align:center;margin-bottom:44px;opacity:0;animation:fadeUp .8s ease .3s forwards}
@@ -63,14 +72,14 @@ body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-lin
 .hero-name{font-size:clamp(28px,5.5vw,48px);font-weight:900;line-height:1.1;letter-spacing:-.03em;margin-bottom:8px}
 .hero-name em{font-style:normal;background:linear-gradient(135deg,var(--cyan),var(--cyan2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .hero-sub{font-size:clamp(14px,2.5vw,17px);color:var(--muted);line-height:1.65;max-width:520px;margin:0 auto 20px}
-.hero-commitment{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);background:rgba(0,221,180,.08);border:1px solid rgba(0,221,180,.2);border-radius:999px;padding:8px 20px}
+.hero-commitment{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--text);background:rgba(0,128,221,.08);border:1px solid rgba(0,128,221,.2);border-radius:999px;padding:8px 20px}
 .hero-commitment svg{width:14px;height:14px;stroke:var(--cyan);fill:none}
 
 /* ── Cost Reframe Strip ── */
-.cost-reframe{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(0,221,180,.08);border:1px solid rgba(0,221,180,.12);border-radius:18px;overflow:hidden;margin-bottom:32px;opacity:0;animation:fadeUp .7s ease .5s forwards}
+.cost-reframe{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(0,128,221,.08);border:1px solid rgba(0,128,221,.12);border-radius:18px;overflow:hidden;margin-bottom:32px;opacity:0;animation:fadeUp .7s ease .5s forwards}
 @media(max-width:479px){.cost-reframe{grid-template-columns:1fr}}
 .reframe-cell{background:var(--card);backdrop-filter:blur(16px);padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;position:relative;overflow:hidden}
-.reframe-cell::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,221,180,.22),transparent)}
+.reframe-cell::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,128,221,.22),transparent)}
 .reframe-emoji{font-size:20px;margin-bottom:2px}
 .reframe-label{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
 .reframe-val{font-size:20px;font-weight:800;line-height:1;background:linear-gradient(135deg,var(--cyan),var(--cyan2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -78,15 +87,15 @@ body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-lin
 .reframe-vs{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-top:2px}
 
 /* ── Main Offer Card ── */
-.offer-card{position:relative;background:linear-gradient(155deg,rgba(0,35,65,.88) 0%,rgba(5,15,40,.94) 100%);border:1px solid rgba(0,221,180,.28);border-radius:24px;padding:28px 24px;backdrop-filter:blur(24px);box-shadow:0 0 0 1px rgba(0,221,180,.06),0 32px 96px rgba(0,0,0,.55),0 0 80px rgba(0,221,180,.06);margin-bottom:24px;overflow:hidden;opacity:0;animation:fadeUp .9s cubic-bezier(.22,1,.36,1) .6s forwards}
-.offer-card::before{content:'';position:absolute;top:0;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,221,180,.55),transparent)}
-.offer-card::after{content:'';position:absolute;bottom:-80px;right:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(0,221,180,.1) 0%,transparent 70%);pointer-events:none}
+.offer-card{position:relative;background:rgba(255,255,255,0.95);border:1px solid rgba(13,50,86,.15);border-radius:24px;padding:28px 24px;backdrop-filter:blur(24px);box-shadow:0 8px 30px rgba(15,23,42,0.08),inset 0 1px 0 rgba(255,255,255,0.6);margin-bottom:24px;overflow:hidden;opacity:0;animation:fadeUp .9s cubic-bezier(.22,1,.36,1) .6s forwards}
+.offer-card::before{content:'';position:absolute;top:0;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,rgba(13,50,86,.15),transparent)}
+.offer-card::after{content:'';position:absolute;bottom:-80px;right:-80px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(13,50,86,.03) 0%,transparent 70%);pointer-events:none}
 
 /* Shimmer on card */
 .card-shimmer{position:absolute;top:0;left:0;width:45%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.028),transparent);pointer-events:none;animation:shimmerSlide 4s ease-in-out 1.5s infinite}
 
 /* Discount badge */
-.discount-badge{position:absolute;top:-1px;right:24px;background:linear-gradient(135deg,var(--red),#ff8a00);color:#fff;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:6px 16px 8px;border-radius:0 0 14px 14px;box-shadow:0 6px 20px rgba(255,89,89,.4);animation:pulseGold 3s ease-in-out 2s infinite}
+.discount-badge{position:absolute;top:-1px;right:24px;background:linear-gradient(135deg,var(--red),var(--earth-yellow));color:#fff;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:6px 16px 8px;border-radius:0 0 14px 14px;box-shadow:0 6px 20px rgba(255,10,10,.3);animation:pulseGold 3s ease-in-out 2s infinite}
 
 /* Plan title row */
 .plan-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;flex-wrap:wrap}
@@ -95,7 +104,7 @@ body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-lin
 .plan-focus{font-size:14px;color:var(--muted);margin-bottom:22px;line-height:1.6}
 
 /* Divider */
-.card-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,221,180,.14),transparent);margin:22px 0}
+.card-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(13,50,86,.12),transparent);margin:22px 0}
 
 /* Features + Price grid */
 .offer-grid{display:grid;grid-template-columns:1fr;gap:24px}
@@ -251,7 +260,7 @@ body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-lin
       <div class="reframe-emoji">🧬</div>
       <div class="reframe-label">Your plan / month</div>
       <div class="reframe-val" id="planPerMonth" style="color:var(--cyan)">—</div>
-      <div class="reframe-sub">Complete transformation<br>with daily AI coaching</div>
+      <div class="reframe-sub">Complete transformation<br>with personalized coaching powered by AI scoring</div>
       <div class="reframe-vs" style="color:var(--cyan)">✓ less than both</div>
     </div>
   </div>
@@ -302,6 +311,15 @@ body::after{content:'';position:fixed;inset:0;z-index:1;background:repeating-lin
       </div>
     </div>
   </div>
+
+  <!-- Price Lock Section -->
+  <div id="priceLockContainer" style="margin:32px 0;"></div>
+
+  <!-- Coach Carousel Section -->
+  <div id="coachCarouselContainer" style="margin:32px 0;"></div>
+
+  <!-- EMI Calculator Section -->
+  <div id="emiCalculatorContainer" style="margin:32px 0;"></div>
 
   <!-- CTA -->
   <div class="cta-section">
@@ -489,7 +507,7 @@ function calcPlan(){
       saving: saving,
       perDay: perDay,
       planName: storedPlan.name || 'Fitstart Total Transformation Plan',
-      planFocus: storedPlan.objective || 'Full-spectrum metabolic reset combining fat-loss nutrition, progressive training, and daily AI coaching.',
+      planFocus: storedPlan.objective || 'Full-spectrum metabolic reset combining fat-loss nutrition, progressive training, and personalized coaching powered by AI-driven biological scoring.',
       planDurationLabel: `⏱ ${weeks} Weeks`,
       discount: Math.round((saving / fullPrice) * 100)
     };
@@ -527,7 +545,7 @@ function calcPlan(){
     planFocus='Progressive overload, optimised recovery, and precision nutrition to reach elite-level fitness benchmarks.'
   } else {
     planName='Fitstart Total Transformation Plan';
-    planFocus='Full-spectrum metabolic reset combining fat-loss nutrition, progressive training, and daily AI coaching.'
+    planFocus='Full-spectrum metabolic reset combining fat-loss nutrition, progressive training, and personalized coaching powered by AI-driven biological scoring.'
   }
   planDurationLabel=`⏱ ${weeks} Weeks`;
 
@@ -580,8 +598,8 @@ function buildFeatures(){
 ══════════════════════════════════════════════════ */
 const testimonials=[
   {stars:'★★★★★',text:`"Lost ${Math.round(wtDiff*.8)} kg in ${plan.weeks-2} weeks. I'd tried everything — this is the first thing that actually worked because it was made for my body."`,name:'Priya M.',meta:`Lost ${Math.round(wtDiff*.8)} kg · ${plan.weeks} weeks`,color:'rgba(0,221,180,.15)'},
-  {stars:'★★★★★',text:'"The biological age reduction was wild — I went from feeling 40 to feeling 28 in 3 months. The AI coaching nudges kept me accountable every single day."',name:'Rahul K.',meta:'Bio age: -6 years · 12 weeks',color:'rgba(0,184,255,.15)'},
-  {stars:'★★★★★',text:'"I was sceptical about the AI coaching. Now I tell everyone — this is the accountability partner I never had. My coach knows my data better than I do."',name:'Sneha R.',meta:'Energy levels: transformed',color:'rgba(100,100,255,.15)'},
+  {stars:'★★★★★',text:'"The biological age reduction was significant — I went from feeling 40 to feeling 28 in 3 months. The personalized coaching with AI-driven insights kept me accountable every single day."',name:'Rahul K.',meta:'Bio age: -6 years · 12 weeks',color:'rgba(0,184,255,.15)'},
+  {stars:'★★★★★',text:'"I was sceptical about the AI scoring. Now I tell everyone — this is the accountability partner I never had. My coach uses the biological intelligence to personalize every session."',name:'Sneha R.',meta:'Energy levels: transformed',color:'rgba(100,100,255,.15)'},
   {stars:'★★★★★',text:'"₹'+plan.perDay+' per day is genuinely less than my evening chai. Except this chai got me the body I actually want."',name:'Arjun T.',meta:'Value customer · 16 weeks',color:'rgba(245,197,24,.1)'}
 ];
 
@@ -711,6 +729,118 @@ if(window.gsap){
   gsap.to('.offer-card',{y:-4,duration:4,ease:'sine.inOut',repeat:-1,yoyo:true});
   gsap.to('.price-main',{scale:1.03,duration:3,ease:'sine.inOut',repeat:-1,yoyo:true,delay:.5});
 }
+
+/* ══════════════════════════════════════════════════
+   RAZORPAY INTEGRATION
+══════════════════════════════════════════════════ */
+(function(){
+  // Load Razorpay script if not already loaded
+  if(typeof Razorpay==='undefined'){
+    const script=document.createElement('script');
+    script.src='https://checkout.razorpay.com/v1/checkout.js';
+    script.onload=initRazorpay;
+    document.head.appendChild(script);
+  }else{
+    initRazorpay();
+  }
+  
+  function initRazorpay(){
+    const ctaButtons=document.querySelectorAll('#mainCta, #ctaText2, .sticky-cta .cta-btn');
+    ctaButtons.forEach(btn=>{
+      btn.addEventListener('click',function(e){
+        e.preventDefault();
+        openRazorpayCheckout();
+      });
+    });
+  }
+  
+  function openRazorpayCheckout(){
+    // Get plan data
+    const plan=calcPlan();
+    
+    // Get user data
+    let userName='',userEmail='',userPhone='';
+    try{
+      const stored=localStorage.getItem('assessmentData')||localStorage.getItem('unlimitr_assessment');
+      if(stored){
+        const data=JSON.parse(stored);
+        userName=data.clientName||data.name||'';
+        userEmail=data.clientEmail||data.email||'';
+        userPhone=data.phone||data.mobile||'';
+      }
+    }catch(e){}
+    
+    const options={
+      key:'YOUR_RAZORPAY_KEY', // Replace with actual Razorpay key
+      amount:plan.price*100,
+      currency:'INR',
+      name:'Unlimitr',
+      description:plan.planName||'Structured Correction Plan',
+      image:'https://unlimitr.com/img/hca_logo.svg',
+      handler:function(response){
+        // Redirect to thank-you page with payment ID
+        window.location.href='../thank-you.html?payment_id='+response.razorpay_payment_id;
+      },
+      prefill:{
+        name:userName,
+        email:userEmail,
+        contact:userPhone
+      },
+      theme:{
+        color:'#0080DD'
+      },
+      modal:{
+        ondismiss:function(){
+          console.log('Payment cancelled');
+        }
+      }
+    };
+    
+    const rzp=new Razorpay(options);
+    rzp.on('payment.failed',function(response){
+      console.error('Payment failed:',response);
+      alert('Payment failed. Please try again or contact support.');
+    });
+    rzp.open();
+  }
+})();
+
+/* ══════════════════════════════════════════════════
+   INITIALIZE COMPONENTS
+══════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+  // Initialize Price Lock
+  if (typeof PriceLockManager !== 'undefined') {
+    const priceLockContainer = document.getElementById('priceLockContainer');
+    if (priceLockContainer) {
+      const manager = new PriceLockManager();
+      manager.init();
+    }
+  }
+
+  // Initialize Coach Carousel
+  if (typeof CoachCarousel !== 'undefined') {
+    const coachContainer = document.getElementById('coachCarouselContainer');
+    if (coachContainer) {
+      const carousel = new CoachCarousel('coachCarouselContainer');
+      carousel.init();
+    }
+  }
+
+  // Initialize EMI Calculator
+  if (typeof EMICalculator !== 'undefined') {
+    const emiContainer = document.getElementById('emiCalculatorContainer');
+    if (emiContainer) {
+      const plan = calcPlan();
+      const emiCalc = new EMICalculator('emiCalculatorContainer', {
+        duration: plan.weeks / 4, // Convert weeks to months
+        price: plan.price,
+        name: plan.planName
+      });
+      emiCalc.init();
+    }
+  }
+});
 </script>
 </body>
 </html>
